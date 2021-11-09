@@ -15,7 +15,7 @@ public class UserDetailsRequestModel {
 
     private String password;
 
-    private CardEntity cardDetails;
+    private CardRequestModel cardDetails;
 
     private List<AddressRequestModel> address;
 
@@ -51,11 +51,11 @@ public class UserDetailsRequestModel {
         this.email = email;
     }
 
-    public CardEntity getCardDetails() {
+    public CardRequestModel getCardDetails() {
         return cardDetails;
     }
 
-    public void setCardDetails(CardEntity cardDetails) {
+    public void setCardDetails(CardRequestModel cardDetails) {
         this.cardDetails = cardDetails;
     }
 
