@@ -23,10 +23,6 @@ public class ItemEntity implements Serializable {
     private Integer price;
     @Column(nullable = false,length = 250)
     private String description;
-    @Column(nullable = false,length = 5)
-    private Float rating;
-    @Column(nullable = false,length = 250)
-    private String comments;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -72,22 +68,6 @@ public class ItemEntity implements Serializable {
         this.description = description;
     }
 
-    public Float getRating() {
-        return rating;
-    }
-
-    public void setRating(Float rating) {
-        this.rating = rating;
-    }
-
-    public String getComments() {
-        return comments;
-    }
-
-    public void setComments(String comments) {
-        this.comments = comments;
-    }
-
     public CategoryEntity getCategoryDetails() {
         return categoryDetails;
     }
@@ -95,4 +75,5 @@ public class ItemEntity implements Serializable {
     public void setCategoryDetails(CategoryEntity categoryDetails) {
         this.categoryDetails = categoryDetails;
     }
+
 }
