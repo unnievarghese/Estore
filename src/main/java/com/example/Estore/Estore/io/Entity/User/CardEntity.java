@@ -1,17 +1,30 @@
-package com.example.Estore.Estore.Shared.dto;
+package com.example.Estore.Estore.io.Entity.User;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
-public class CardDto {
+@Entity
+@Table(name = "cardDetails")
+public class CardEntity implements Serializable {
+
+    private static final long serialVersionUID = -5271438957437210217L;
+    @Id
+    @GeneratedValue
     private Long id;
-    private String cardId;
+
+    @Column(length = 25)
     private Long cardNumber;
+
+    @Column(length = 5)
     private Long cvv;
+
+    @Column(length = 15)
     private Date expiryDate;
-    private UserDto userCardDetails;
+
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity userCardDetails;
 
     public Long getId() {
         return id;
@@ -29,11 +42,11 @@ public class CardDto {
         this.cardNumber = cardNumber;
     }
 
-    public Long getCvv() {
+    public long getCvv() {
         return cvv;
     }
 
-    public void setCvv(Long cvv) {
+    public void setCvv(long cvv) {
         this.cvv = cvv;
     }
 
@@ -45,19 +58,11 @@ public class CardDto {
         this.expiryDate = expiryDate;
     }
 
-    public String getCardId() {
-        return cardId;
-    }
-
-    public void setCardId(String cardId) {
-        this.cardId = cardId;
-    }
-
-    public UserDto getUserCardDetails() {
+    public UserEntity getUserCardDetails() {
         return userCardDetails;
     }
 
-    public void setUserCardDetails(UserDto userCardDetails) {
+    public void setUserCardDetails(UserEntity userCardDetails) {
         this.userCardDetails = userCardDetails;
     }
 }

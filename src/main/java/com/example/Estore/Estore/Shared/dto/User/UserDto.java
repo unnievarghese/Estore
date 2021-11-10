@@ -1,8 +1,5 @@
-package com.example.Estore.Estore.Shared.dto;
+package com.example.Estore.Estore.Shared.dto.User;
 
-import com.example.Estore.Estore.io.Entity.CardEntity;
-
-import javax.persistence.Column;
 import java.io.Serializable;
 import java.util.List;
 
@@ -18,7 +15,7 @@ public class UserDto implements Serializable {
     private String password;
     private String encryptedPassword;
     private String emailVerificationToken;
-    private Boolean emailVerificationStatus = false;
+    private Boolean emailVerificationStatus;
     private List<AddressDto> address;
     private CardDto cardDetails;
 

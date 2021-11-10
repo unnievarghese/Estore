@@ -1,4 +1,4 @@
-package com.example.Estore.Estore.Shared.dto;
+package com.example.Estore.Estore.Shared.dto.User;
 
 public class AddressDto {
     private long id;
