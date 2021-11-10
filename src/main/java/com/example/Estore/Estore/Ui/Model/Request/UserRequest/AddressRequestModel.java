@@ -1,4 +1,4 @@
-package com.example.Estore.Estore.Ui.Model.Request;
+package com.example.Estore.Estore.Ui.Model.Request.UserRequest;
 
 public class AddressRequestModel {
     private String city;

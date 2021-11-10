@@ -2,14 +2,11 @@ package com.example.Estore.Estore.Services.ServiceImpl;
 
 import com.example.Estore.Estore.Services.UserService;
 import com.example.Estore.Estore.Shared.dto.*;
-import com.example.Estore.Estore.io.Entity.AddressEntity;
-import com.example.Estore.Estore.io.Entity.CategoryEntity;
-import com.example.Estore.Estore.io.Entity.ItemEntity;
-import com.example.Estore.Estore.io.Entity.UserEntity;
-import com.example.Estore.Estore.io.Repositories.AddressRepository;
-import com.example.Estore.Estore.io.Repositories.CategoryRepository;
-import com.example.Estore.Estore.io.Repositories.ItemRepository;
-import com.example.Estore.Estore.io.Repositories.UserRepository;
+import com.example.Estore.Estore.Shared.dto.User.AddressDto;
+import com.example.Estore.Estore.Shared.dto.User.CardDto;
+import com.example.Estore.Estore.Shared.dto.User.UserDto;
+import com.example.Estore.Estore.io.Entity.User.UserEntity;
+import com.example.Estore.Estore.io.Repositories.User.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +15,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 @Service
@@ -26,12 +24,6 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     UserRepository userRepository;
-    @Autowired
-    AddressRepository addressRepository;
-    @Autowired
-    CategoryRepository categoryRepository;
-    @Autowired
-    ItemRepository itemRepository;
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
@@ -59,6 +51,35 @@ public class UserServiceImpl implements UserService {
         UserDto returnValue =new ModelMapper().map(storedUserDetails,UserDto.class);
         return returnValue;
     }
+    @Override
+    public UserDto updateUser(String userId, UserDto user) {
+
+        UserEntity userEntity = userRepository.findByUserId(userId);
+        if (userEntity == null) throw new UsernameNotFoundException(userId);
+        Method[] dtoMethods = user.getClass().getMethods();
+        Method[] entityMethods = userEntity.getClass().getMethods();
+        for (int i=0;i<dtoMethods.length;i++){
+            if(dtoMethods[i].getName().contains("get")){
+                try {
+                    if(dtoMethods[i].invoke(user) instanceof String){
+                        String valueToChange =(String) dtoMethods[i].invoke(user);
+                        String methodName = dtoMethods[i].getName();
+                        methodName = methodName.replace("get","set");
+                        for (int j=0; j<entityMethods.length;j++){
+                            if(entityMethods[j].getName().contains(methodName)){
+                               entityMethods[j].invoke(userEntity,valueToChange);
+                            }
+                        }
+                    }
+                }
+                catch (IllegalAccessException | InvocationTargetException e){
+                    e.printStackTrace();
+                }
+            };
+        }
+        UserEntity updatedUserDetails = userRepository.save(userEntity);
+        return new ModelMapper().map(updatedUserDetails,UserDto.class);
+    }
 
     @Override
     public UserDto getUser(String email) {
@@ -69,35 +90,6 @@ public class UserServiceImpl implements UserService {
         BeanUtils.copyProperties(userEntity,returnValue);
 
         return returnValue;
-    }
-
-    @Override
-    public CategoryDto createCategory(CategoryDto category) {
-
-        if(categoryRepository.findByName(category.getName()) != null) throw new RuntimeException("Record Already Exixts");
-
-        CategoryEntity categoryEntity = new ModelMapper().map(category,CategoryEntity.class);
-        categoryEntity.setCategoryId(utils.generateCategoryId(30));
-
-        CategoryEntity storedCategoryName = categoryRepository.save(categoryEntity);
-
-        return new ModelMapper().map(storedCategoryName,CategoryDto.class);
-    }
-
-    @Override
-    public ItemDto createItem(ItemDto item) {
-
-        if(itemRepository.findByName(item.getName()) != null) throw new RuntimeException("Record Already Exixts");
-
-        CategoryEntity categoryEntity = categoryRepository.findByName(item.getCategory());
-
-        ItemEntity itemEntity = new ModelMapper().map(item,ItemEntity.class);
-        itemEntity.setItemId(utils.generateItemId(30));
-        itemEntity.setCategoryDetails(categoryEntity);
-
-        ItemEntity storedItemName = itemRepository.save(itemEntity);
-
-        return new ModelMapper().map(storedItemName,ItemDto.class);
     }
 
     @Override

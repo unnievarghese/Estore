@@ -1,6 +1,5 @@
-package com.example.Estore.Estore.Ui.Model.Request;
+package com.example.Estore.Estore.Ui.Model.Request.UserRequest;
 
-import com.example.Estore.Estore.io.Entity.CardEntity;
 import java.util.List;
 
 public class UserDetailsRequestModel {
