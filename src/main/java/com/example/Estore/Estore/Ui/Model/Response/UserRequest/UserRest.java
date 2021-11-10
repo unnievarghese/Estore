@@ -1,4 +1,4 @@
-package com.example.Estore.Estore.Ui.Model.Response;
+package com.example.Estore.Estore.Ui.Model.Response.UserRequest;
 
 import java.util.List;
 

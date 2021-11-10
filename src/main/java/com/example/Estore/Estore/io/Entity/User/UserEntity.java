@@ -1,4 +1,4 @@
-package com.example.Estore.Estore.io.Entity;
+package com.example.Estore.Estore.io.Entity.User;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -35,8 +35,6 @@ public class UserEntity implements Serializable {
     @OneToOne(mappedBy = "userCardDetails",cascade = CascadeType.ALL)
     private CardEntity cardDetails;
 
-    @OneToOne(mappedBy = "userCartDetails",cascade = CascadeType.ALL)
-    private CartEntity cartDetails;
 
     public long getId() {
         return id;
@@ -116,14 +114,6 @@ public class UserEntity implements Serializable {
 
     public void setCardDetails(CardEntity cardDetails) {
         this.cardDetails = cardDetails;
-    }
-
-    public CartEntity getCartDetails() {
-        return cartDetails;
-    }
-
-    public void setCartDetails(CartEntity cartDetails) {
-        this.cartDetails = cartDetails;
     }
 
     public List<AddressEntity> getAddress() {
