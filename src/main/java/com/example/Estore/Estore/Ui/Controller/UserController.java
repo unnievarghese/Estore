@@ -1,18 +1,16 @@
 package com.example.Estore.Estore.Ui.Controller;
 
 import com.example.Estore.Estore.Services.UserService;
-import com.example.Estore.Estore.Shared.dto.CategoryDto;
-import com.example.Estore.Estore.Shared.dto.ItemDto;
-import com.example.Estore.Estore.Shared.dto.UserDto;
-import com.example.Estore.Estore.Ui.Model.Request.CategoryRequestModel;
-import com.example.Estore.Estore.Ui.Model.Request.ItemRequestModel;
-import com.example.Estore.Estore.Ui.Model.Request.UserDetailsRequestModel;
-import com.example.Estore.Estore.Ui.Model.Response.CategoryRest;
-import com.example.Estore.Estore.Ui.Model.Response.ItemRest;
-import com.example.Estore.Estore.Ui.Model.Response.UserRest;
+import com.example.Estore.Estore.Shared.dto.User.UserDto;
+import com.example.Estore.Estore.Ui.Model.Request.UserRequest.UserDetailsRequestModel;
+import com.example.Estore.Estore.Ui.Model.Response.UserRequest.UserRest;
+import com.example.Estore.Estore.io.Entity.User.UserEntity;
+import com.example.Estore.Estore.io.Repositories.User.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping(path = "home")
@@ -20,15 +18,11 @@ public class UserController {
 
     @Autowired
     UserService userService;
-
-    @GetMapping
-    public String getUser(){
-        return "this is get";
-    }
+    @Autowired
+    UserRepository userRepository;
 
     @PostMapping(path="/create-user")
     public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) throws Exception {
-
         if(userDetails.getFirstName().isEmpty()) throw new NullPointerException("The Object is Null");
 
         UserDto userDto = new ModelMapper().map(userDetails,UserDto.class);
@@ -37,22 +31,15 @@ public class UserController {
 
         return returnValue;
     }
-    @PostMapping(path="/create-category")
-    public CategoryRest createCategory(@RequestBody CategoryRequestModel category) throws Exception{
 
-        if(category.getName().isEmpty()) throw new NullPointerException("The Object is Null");
+    @PutMapping(path="/update-user/{id}")
+    public UserRest updateUser(@PathVariable String id, Principal principal, @RequestBody UserDetailsRequestModel userDetails) throws Exception {
+        UserEntity userEntity = userRepository.findByUserId(id);
 
-        CategoryDto categoryDto = new ModelMapper().map(category,CategoryDto.class);
-        CategoryDto createdCategory = userService.createCategory(categoryDto);
-        return new ModelMapper().map(createdCategory,CategoryRest.class);
-    }
-    @PostMapping(path="/create-item")
-    public ItemRest createCategory(@RequestBody ItemRequestModel item) throws Exception{
-
-        if(item.getName().isEmpty()) throw new NullPointerException("The Object is Null");
-
-        ItemDto itemDto = new ModelMapper().map(item,ItemDto.class);
-        ItemDto createdItem = userService.createItem(itemDto);
-        return new ModelMapper().map(createdItem,ItemRest.class);
+        if(!userEntity.getEmail().equals(principal.getName())) throw new IllegalAccessException("you have no access to this account");
+        UserDto userDto = new ModelMapper().map(userDetails,UserDto.class);
+        UserDto updatedUser = userService.updateUser(id,userDto);
+        UserRest returnValue= new ModelMapper().map(updatedUser,UserRest.class);
+        return returnValue;
     }
 }

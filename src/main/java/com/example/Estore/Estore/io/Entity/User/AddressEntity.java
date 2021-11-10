@@ -1,4 +1,4 @@
-package com.example.Estore.Estore.io.Entity;
+package com.example.Estore.Estore.io.Entity.User;
 
 import javax.persistence.*;
 import java.io.Serializable;

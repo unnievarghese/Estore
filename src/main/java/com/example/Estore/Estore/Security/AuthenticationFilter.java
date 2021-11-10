@@ -1,9 +1,9 @@
 package com.example.Estore.Estore.Security;
 
 import com.example.Estore.Estore.Services.UserService;
-import com.example.Estore.Estore.Shared.dto.UserDto;
+import com.example.Estore.Estore.Shared.dto.User.UserDto;
 import com.example.Estore.Estore.SpringApplicationContext;
-import com.example.Estore.Estore.Ui.Model.Request.UserLoginRequestModel;
+import com.example.Estore.Estore.Ui.Model.Request.UserRequest.UserLoginRequestModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
