@@ -53,7 +53,6 @@ public class UserServiceImpl implements UserService {
     }
     @Override
     public UserDto updateUser(String userId, UserDto user) {
-
         UserEntity userEntity = userRepository.findByUserId(userId);
         if (userEntity == null) throw new UsernameNotFoundException(userId);
         Method[] dtoMethods = user.getClass().getMethods();
@@ -68,10 +67,7 @@ public class UserServiceImpl implements UserService {
                         for (int j=0; j<entityMethods.length;j++){
                             if(entityMethods[j].getName().contains(methodName)){
                                entityMethods[j].invoke(userEntity,valueToChange);
-                            }
-                        }
-                    }
-                }
+                            }}}}
                 catch (IllegalAccessException | InvocationTargetException e){
                     e.printStackTrace();
                 }

@@ -21,6 +21,11 @@ public class UserController {
     @Autowired
     UserRepository userRepository;
 
+    @GetMapping
+    public String getuser(){
+        return "this is get";
+    }
+
     @PostMapping(path="/create-user")
     public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) throws Exception {
         if(userDetails.getFirstName().isEmpty()) throw new NullPointerException("The Object is Null");
@@ -37,6 +42,7 @@ public class UserController {
         UserEntity userEntity = userRepository.findByUserId(id);
 
         if(!userEntity.getEmail().equals(principal.getName())) throw new IllegalAccessException("you have no access to this account");
+
         UserDto userDto = new ModelMapper().map(userDetails,UserDto.class);
         UserDto updatedUser = userService.updateUser(id,userDto);
         UserRest returnValue= new ModelMapper().map(updatedUser,UserRest.class);
