@@ -20,6 +20,10 @@ public class UserController {
     UserService userService;
     @Autowired
     UserRepository userRepository;
+    public String getProduct()
+    {
+        return "get product was called";
+    }
 
     @PostMapping(path="/create-user")
     public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) throws Exception {
