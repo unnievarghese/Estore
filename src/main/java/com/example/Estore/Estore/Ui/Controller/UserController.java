@@ -20,6 +20,10 @@ public class UserController {
     UserService userService;
     @Autowired
     UserRepository userRepository;
+    public String getProduct()
+    {
+        return "get product was called";
+    }
 
     @GetMapping
     public String getuser(){
