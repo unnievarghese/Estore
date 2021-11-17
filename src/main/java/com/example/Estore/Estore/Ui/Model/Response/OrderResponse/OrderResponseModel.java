@@ -1,24 +1,23 @@
-package com.example.Estore.Estore.Ui.Model.Response;
+package com.example.Estore.Estore.Ui.Model.Response.OrderResponse;
 
 import com.example.Estore.Estore.Ui.Model.Response.UserRequest.AddressesRest;
 
-import java.util.List;
 
-public class OrderDetailsModel {
+public class OrderResponseModel {
 
-    private Long orderId;
+
+    private String orderId;
     private String orderStatus;
     private double orderAmount;
     private AddressesRest shippingAddress;
     private AddressesRest billingAddress;
-    private List<CartItemDetails> cartItemDetailsList;
 
 
-    public Long getOrderId() {
+    public String getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(Long orderId) {
+    public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
 
@@ -53,12 +52,5 @@ public class OrderDetailsModel {
     public void setBillingAddress(AddressesRest billingAddress) {
         this.billingAddress = billingAddress;
     }
-
-    public List<CartItemDetails> getCartItemDetailsList() {
-        return cartItemDetailsList;
-    }
-
-    public void setCartItemDetailsList(List<CartItemDetails> cartItemDetailsList) {
-        this.cartItemDetailsList = cartItemDetailsList;
-    }
 }
+

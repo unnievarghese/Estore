@@ -1,36 +1,26 @@
-package com.example.Estore.Estore.Shared.dto;
+package com.example.Estore.Estore.Shared.dto.Order;
 
 import com.example.Estore.Estore.Shared.dto.User.AddressDto;
-import com.example.Estore.Estore.Ui.Model.Response.UserRequest.AddressesRest;
 
 import java.io.Serializable;
-import java.util.List;
 
 public class OrderDto implements Serializable {
 
-    private Long orderId;
+    private long orderId;
     private String orderStatus;
-    private int orderAmount;
+    private double orderAmount;
     private AddressDto shippingAddress;
     private AddressDto billingAddress;
-    private CartDto cartDto;
+    //private CartDto cartDto;
 
-    public OrderDto() {
-    }
 
-    public OrderDto(String orderStatus, int orderAmount, AddressDto shippingAddress, AddressDto billingAddress, CartDto cartDto) {
-        this.orderStatus = orderStatus;
-        this.orderAmount = orderAmount;
-        this.shippingAddress = shippingAddress;
-        this.billingAddress = billingAddress;
-        this.cartDto = cartDto;
-    }
 
-    public Long getOrderId() {
+
+    public long getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(Long orderId) {
+    public void setOrderId(long orderId) {
         this.orderId = orderId;
     }
 
@@ -42,7 +32,7 @@ public class OrderDto implements Serializable {
         this.orderStatus = orderStatus;
     }
 
-    public int getOrderAmount() {
+    public double getOrderAmount() {
         return orderAmount;
     }
 
@@ -66,11 +56,11 @@ public class OrderDto implements Serializable {
         this.billingAddress = billingAddress;
     }
 
-    public CartDto getCartDto() {
-        return cartDto;
-    }
-
-    public void setCartDto(CartDto cartDto) {
-        this.cartDto = cartDto;
-    }
+//    public CartDto getCartDto() {
+//        return cartDto;
+//    }
+//
+//    public void setCartDto(CartDto cartDto) {
+//        this.cartDto = cartDto;
+//    }
 }
