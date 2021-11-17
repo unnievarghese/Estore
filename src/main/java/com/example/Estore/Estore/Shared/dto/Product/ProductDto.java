@@ -3,7 +3,7 @@ package com.example.Estore.Estore.Shared.dto.Product;
 import java.io.Serializable;
 
 public class ProductDto implements Serializable {
-    private Long productId;
+    private Long productId ;
     private String productName;
     private String description;
     private int price;

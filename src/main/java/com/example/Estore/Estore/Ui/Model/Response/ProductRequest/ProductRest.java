@@ -1,6 +1,7 @@
 package com.example.Estore.Estore.Ui.Model.Response.ProductRequest;
 
 public class ProductRest {
+
     public Long productId;
     private String productName;
     private String description;
