@@ -21,13 +21,9 @@ public class Utils {
         return generateRandomString(lenght);
     }
 
-    public String generateCategoryId(int lenght) {
-        return generateRandomString(lenght);
-    }
 
-    public String generateItemId(int lenght) {
-        return generateRandomString(lenght);
-    }
+
+
 
     public String generateRandomString(int lenght) {
         StringBuilder returnValue = new StringBuilder(lenght);

@@ -10,7 +10,7 @@ import java.io.Serializable;
 public class ProductEntity implements Serializable {
     @Id
     @GeneratedValue
-    private Long ProductId;
+    private Long productId;
     @Column(nullable = false)
     private String productName;
     private String description;
@@ -20,11 +20,11 @@ public class ProductEntity implements Serializable {
     private Integer quantity;
 
     public Long getProductId() {
-        return ProductId;
+        return productId;
     }
 
     public void setProductId(Long productId) {
-        ProductId = productId;
+        this.productId = productId;
     }
 
     public String getProductName() {
