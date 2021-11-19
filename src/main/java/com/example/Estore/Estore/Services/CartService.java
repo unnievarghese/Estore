@@ -9,9 +9,6 @@ import com.example.Estore.Estore.io.Repositories.User.UserRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -52,21 +49,25 @@ public class CartService {
 
     }
 
-    public String updateCartItem(UserDto user ,Long productId, Integer quantity,Integer reducequantity) {
+    public String updateCartItem(UserDto user ,Long productId, Integer quantity,Integer reduceQuantity) {
         ProductEntity productEntity = productRepository.findByProductId(productId);
+
         UserEntity userEntity= new UserEntity();
         BeanUtils.copyProperties(user,userEntity);
+
         CartItemEntity cartItemEntity=cartItemRepository.findByUserEntityANDProductId(userEntity,productId);
+
         if (cartItemEntity==null){
+
             return "Cart is not active";
         }
-
         cartItemEntity.setQuantity(cartItemEntity.getQuantity()+quantity);
-        cartItemEntity.setQuantity(cartItemEntity.getQuantity()-reducequantity);
-        cartItemEntity.setTotalPrice(cartItemEntity.getTotalPrice()+(productEntity.getPrice()*quantity));
-        cartItemEntity.setTotalPrice(cartItemEntity.getTotalPrice()-(productEntity.getPrice()*reducequantity));
-        cartItemRepository.save(cartItemEntity);
-        return "Cart updated";
+        cartItemEntity.setQuantity(cartItemEntity.getQuantity()-reduceQuantity);
 
+        cartItemEntity.setTotalPrice(cartItemEntity.getTotalPrice()+(productEntity.getPrice()*quantity));
+        cartItemEntity.setTotalPrice(cartItemEntity.getTotalPrice()-(productEntity.getPrice()*reduceQuantity));
+        cartItemRepository.save(cartItemEntity);
+
+        return "Cart updated";
 
 }}

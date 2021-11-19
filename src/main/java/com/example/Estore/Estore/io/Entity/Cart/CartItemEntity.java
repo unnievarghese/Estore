@@ -18,6 +18,7 @@ public class CartItemEntity {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "product_id")
     private ProductEntity productEntity;
+    private int quantity;
     @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="user_id")
@@ -71,7 +72,6 @@ public class CartItemEntity {
         this.productName = productName;
     }
 
-    private int quantity;
 
     public UserEntity getUserEntity() {
         return userEntity;

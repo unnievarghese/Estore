@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -22,6 +21,8 @@ public class CartController {
     CartService cartService;
     @Autowired
     UserService userService;
+
+//  http://localhost:8080/Estore/cart/add/{productId}?quantity={?}
 
     @PostMapping(path = "/add/{productId}")
     public CartItemRest addCartItem(@PathVariable(value = "productId") Long productId,
@@ -35,6 +36,7 @@ public class CartController {
             return new ModelMapper().map(cartItemEntity, CartItemRest.class);
         }
     }
+//  http://localhost:8080/Estore/cart/get
 
     @GetMapping(path = "/get")
     public List<CartItemEntity> getCartById() {
@@ -45,6 +47,7 @@ public class CartController {
         return cartItemEntityList;
 
     }
+//  http://localhost:8080/Estore/cart/delete/{productId}
 
     @DeleteMapping(path = "/delete/{productId}")
     public OperationStatusModel removeProduct(@PathVariable(value = "productId") Long productId) throws Exception {
@@ -61,6 +64,8 @@ public class CartController {
 
         }
     }
+//    http://localhost:8080/Estore/cart/update/{productId}?quantity={count}
+//    http://localhost:8080/Estore/cart/update/{productId}?reduceQuantity={count}
 
     @PutMapping("/update/{productId}")
     public String updateCartItem(@PathVariable(value = "productId") Long productId,
