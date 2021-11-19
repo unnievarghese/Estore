@@ -11,6 +11,8 @@ public class ProductEntity implements Serializable {
     @Id
     @GeneratedValue
     private Long ProductId;
+
+
     @Column(nullable = false)
     private String productName;
     private String description;
@@ -18,6 +20,8 @@ public class ProductEntity implements Serializable {
     private Integer price;
     @Column(nullable = false)
     private Integer quantity;
+
+
 
     public Long getProductId() {
         return ProductId;

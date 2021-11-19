@@ -1,31 +1,43 @@
 package com.example.Estore.Estore.Shared.dto.WishList;
 
-public class WishListDto {
-    private long wishListId;
-    private long userId;
-    private long productId;
+import com.example.Estore.Estore.io.Entity.Product.ProductEntity;
+import com.example.Estore.Estore.io.Entity.User.UserEntity;
 
-    public long getWishListId() {
+public class WishListDto {
+    private String wishListId;
+    private ProductEntity productEntity;
+    private String productName;
+    private UserEntity userEntity;
+
+    public String getWishListId() {
         return wishListId;
     }
 
-    public void setWishListId(long wishListId) {
+    public void setWishListId(String wishListId) {
         this.wishListId = wishListId;
     }
 
-    public long getUserId() {
-        return userId;
+    public ProductEntity getProductEntity() {
+        return productEntity;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setProductEntity(ProductEntity productEntity) {
+        this.productEntity = productEntity;
     }
 
-    public long getProductId() {
-        return productId;
+    public String getProductName() {
+        return productName;
     }
 
-    public void setProductId(long productId) {
-        this.productId = productId;
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public UserEntity getUserEntity() {
+        return userEntity;
+    }
+
+    public void setUserEntity(UserEntity userEntity) {
+        this.userEntity = userEntity;
     }
 }
