@@ -10,6 +10,7 @@ import java.io.Serializable;
 public class ProductEntity implements Serializable {
     @Id
     @GeneratedValue
+
     private Long productId;
     @Column(nullable = false)
     private String productName;
@@ -18,6 +19,8 @@ public class ProductEntity implements Serializable {
     private Integer price;
     @Column(nullable = false)
     private Integer quantity;
+
+
 
     public Long getProductId() {
         return productId;
