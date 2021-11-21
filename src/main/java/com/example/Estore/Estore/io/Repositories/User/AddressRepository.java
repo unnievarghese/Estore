@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface AddressRepository extends CrudRepository<AddressEntity , Long> {
 
 
+    AddressEntity findByAddressId(String addressId);
 }

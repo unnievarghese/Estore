@@ -1,7 +1,12 @@
 package com.example.Estore.Estore.Shared.dto;
 
+import com.example.Estore.Estore.Security.SecurityConstants;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.stereotype.Component;
 import java.security.SecureRandom;
+import java.util.Date;
 
 @Component
 public class Utils {
@@ -24,6 +29,32 @@ public class Utils {
 
 
 
+    public String generateEmailVerificationToken(String userId){
+        String token = Jwts.builder()
+                .setSubject(userId)
+                .setExpiration(new Date(System.currentTimeMillis()+ SecurityConstants.EMAIL_EXPIRATION_TIME))
+                .signWith(SignatureAlgorithm.HS512,SecurityConstants.getTokenSecret())
+                .compact();
+        return token;
+    }
+
+    public static boolean hasTokenExpired(String token){
+        Claims claims = Jwts.parser()
+                .setSigningKey(SecurityConstants.getTokenSecret())
+                .parseClaimsJws(token).getBody();
+        Date tokenExpirationTime = claims.getExpiration();
+        Date currentTime = new Date();
+        return tokenExpirationTime.before(currentTime);
+    }
+
+    public String generatePasswordResetToken(String userId){
+        String token = Jwts.builder()
+                .setSubject(userId)
+                .setExpiration(new Date(System.currentTimeMillis()+SecurityConstants.EMAIL_EXPIRATION_TIME))
+                .signWith(SignatureAlgorithm.HS512,SecurityConstants.getTokenSecret())
+                .compact();
+        return token;
+    }
 
     public String generateRandomString(int lenght) {
         StringBuilder returnValue = new StringBuilder(lenght);
@@ -33,4 +64,5 @@ public class Utils {
         }
         return new String(returnValue);
     }
+
 }
