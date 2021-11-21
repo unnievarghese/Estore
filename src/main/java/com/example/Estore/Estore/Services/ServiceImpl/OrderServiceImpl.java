@@ -1,20 +1,29 @@
 package com.example.Estore.Estore.Services.ServiceImpl;
+import com.example.Estore.Estore.Shared.dto.Order.OrderDto;
 import com.example.Estore.Estore.Shared.dto.User.UserDto;
 import com.example.Estore.Estore.Ui.Model.Response.OrderResponse.OrderResponseModel;
+import com.example.Estore.Estore.io.Entity.Cart.CartItemEntity;
 import com.example.Estore.Estore.io.Entity.Order.OrderEntity;
 import com.example.Estore.Estore.io.Entity.User.UserEntity;
+import com.example.Estore.Estore.io.Repositories.Cart.CartItemRepository;
 import com.example.Estore.Estore.io.Repositories.Order.OrderRepository;
 import com.example.Estore.Estore.io.Repositories.Product.ProductRepository;
 import com.example.Estore.Estore.io.Repositories.User.AddressRepository;
 import com.example.Estore.Estore.io.Repositories.User.UserRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
     public class OrderServiceImpl {
+
+        @Autowired
+    CartItemRepository cartItemRepository;
 
         @Autowired
         ProductRepository productRepository;
@@ -34,23 +43,37 @@ import java.util.Optional;
 
         public OrderEntity createOrder(String userId) throws Exception {
 
+            //finding user with userid
             UserEntity userEntity = userRepository.findByUserId(userId);
 
 
             OrderEntity orderEntity = new OrderEntity();
+
+            //setting the user address to order
             orderEntity.setShippingAddress(userEntity.getAddress().get(0));
-            orderEntity.setBillingAddress(userEntity.getAddress().get(0));
-            System.out.println("Order Successfully Placed");
 
+
+
+            //setting status as confirmed
             orderEntity.setOrderStatus("confirmed");
-            orderEntity.setOrderId("G5P5A");
-            //orderRepository.findbyOrderAmount();
 
 
+            //finding total amount and setting
+            List<CartItemEntity> cartItemEntity = cartItemRepository.findByUserEntity(userEntity);
+            double totalamount=0;
 
-            orderEntity.setOrderAmount(1000);
-            //cartentity.getquantity * rtemtity.getpricefor
-            //for cartentity
+            for(CartItemEntity item :cartItemEntity){
+
+                //checking cart status
+                if(item.isCartIsActive())
+                 totalamount+=item.getTotalPrice();
+                item.setCartIsActive(false);//making cart status false
+
+            }
+            orderEntity.setOrderAmount(totalamount);
+            orderEntity.setUserEntity(userEntity);
+
+
 
             //cartEntity.setCartStatus("closed");
             orderRepository.save(orderEntity);
@@ -58,56 +81,144 @@ import java.util.Optional;
 
         }
 
+    public OrderEntity createOrderByProductId(Long productId,String userId) throws Exception {
+
+        //finding user with userid
+       UserEntity userEntity = userRepository.findByUserId(userId);
 
 
 
-        public Iterable<OrderEntity> findAllOrders() {
+
+        OrderEntity orderEntity = new OrderEntity();
+
+        //setting the user address to order
+        orderEntity.setShippingAddress(userEntity.getAddress().get(0));
 
 
 
-            //cartEntity.setCartStatus("closed");
-            return orderRepository.findAll();
+        //setting status as confirmed
+        orderEntity.setOrderStatus("confirmed");
 
+        //finding total amount and setting
+        CartItemEntity cartItemEntity = cartItemRepository.findByUserEntityANDProductId(userEntity,productId);
+        double totalamount=0;
+
+        //for(CartItemEntity item :cartItemEntity){
+
+            //checking cart status
+        //if(cartItemEntity.isCartIsActive())
+         totalamount=cartItemEntity.getTotalPrice();
+        cartItemEntity.setCartIsActive(false);//making cart status false
+
+
+        orderEntity.setOrderAmount(totalamount);
+
+
+
+        //cartEntity.setCartStatus("closed");
+        orderRepository.save(orderEntity);
+        return orderEntity;
+
+    }
+
+
+
+
+
+
+//    public List<OrderEntity> findByuserId(Long userId) {
+//        //UserEntity userEntity = new UserEntity();
+//       // BeanUtils.copyProperties(user, userEntity);
+//      List<OrderEntity> orderEntity =orderRepository.findByuserId(userId);
+//      return orderEntity;
+//
+//       // return orderRepository.findByuserId(userId);
+//    }
+
+
+    public List<OrderResponseModel> findByUserId(UserDto user, Long id) throws Exception  {
+
+        //UserEntity userEntity = userRepository.findByUserId(user.getUserId());
+        List<OrderEntity>orderEntityList=orderRepository.findByuserId(id);
+        if ((orderEntityList.isEmpty()))
+        {
+            throw new Exception("no orders by the user");
         }
+        else {
+            List<OrderResponseModel>orders=new ArrayList<>();
+            for (OrderEntity orderEntity:orderEntityList)
+            {
+                OrderResponseModel order=new OrderResponseModel();
+               // orderEntity.setShippingAddress(userEntity.getAddress().get(0));
+
+               // order.setShippingAddress(orderEntity.getShippingAddress());
+                //BeanUtils.copyProperties(orderEntity,order);
+               // orders.add(order);
+                orders.add(new ModelMapper().map(orderEntity,OrderResponseModel.class));
+            }
+            return  orders;
+        }
+    }
+
+
+
+
 
     public OrderEntity updateOrderStatus(UserDto user, Long orderId, String status) throws Exception {
 
-        if (!user.getUserId().equals("seller"))
-            throw new IllegalStateException(orderId + "cannot update");
+        //UserEntity userEntity = userRepository.findByUserId(userId);
 
-            String status1 = status.toLowerCase();
-        if (!status1.equals("shipped") && !status1.equals("in-transit") && !status1.equals("delivered"))
-            throw new IllegalStateException("Invalid update");
 
-        OrderResponseModel orderResponsemodel = new OrderResponseModel();
+        // if (!user.getUserId().equals("seller"))
+        //    throw new IllegalStateException(orderId + "cannot update");
 
-        Optional<OrderEntity> orderEntity = orderRepository.findByOrderId(orderId);
-        if (orderEntity.isEmpty())
-            throw new IllegalStateException("Invalid orderId");
+       // String status1 = status.toLowerCase();
+//        if (!status1.equals("shipped") && !status1.equals("in-transit") && !status1.equals("delivered"))
+//            throw new IllegalStateException("Invalid update");
 
-            if (orderEntity.get().getOrderStatus().equals(status1))
-            throw new IllegalStateException("same status");
+        //UserEntity userEntity= new UserEntity();
+        //BeanUtils.copyProperties(user,userEntity);
 
-        OrderEntity orderEntity1 = orderEntity.get();
-        orderEntity1.setOrderStatus(status1);
 
-        OrderEntity orderEntity2 = orderRepository.save(orderEntity1);
+        //finding order by orderid
+        OrderEntity orderEntity=orderRepository.findByorderId(orderId);
 
-//        BeanUtils.copyProperties(orderEntity2, orderResponsemodel);
-//        AddressResponseModel addressResponseModel = new AddressResponseModel();
-//        BeanUtils.copyProperties(orderEntity2.getShippingAddress(), addressResponseModel);
-//        orderResponsemodel.setShippingAddress(addressResponseModel);
-//        return orderResponsemodel;
-        return null;
+        if(orderEntity.getOrderStatus().equals(status))
+            throw new IllegalStateException("The order is already with the same status");
+
+        //updating order status
+        orderEntity.setOrderStatus(status);
+        orderRepository.save(orderEntity);
+        return orderEntity;
+
+
     }
 
-        public void deleteCart(String orderId){
 
-           // boolean exists=orderRepository.existsById(orderId);
-           // if(!exists)
-                //throw new IllegalStateException(orderId + "does not exist");
-            orderRepository.deleteByOrderId(orderId);
-            //assertThat(deleteRecord).isEqualTo(i);
+
+
+
+        public void removeOrder(UserDto user,Long orderId){
+
+            UserEntity userEntity= new UserEntity();
+            BeanUtils.copyProperties(user,userEntity);
+
+            //finding order by id
+            OrderEntity orderEntity=orderRepository.findByorderId(orderId);
+
+            if(orderEntity.getOrderStatus().equals("delivered")) //|| orderEntity.getOrderStatus().equals("in-transit") || orderEntity.getOrderStatus().equals("delivered"))
+                throw new IllegalStateException("Already delivered");
+
+            else {
+
+                orderEntity.setOrderStatus("cancelled");
+                orderRepository.save(orderEntity);
+
+
+                //orderRepository.deleteOrder(orderId);
+            }
+
+
         }
 
 

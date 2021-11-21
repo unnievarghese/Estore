@@ -6,7 +6,8 @@ import java.io.Serializable;
 
 public class OrderDto implements Serializable {
 
-    private long orderId;
+    public Long id;
+    private String orderId;
     private String orderStatus;
     private double orderAmount;
     private AddressDto shippingAddress;
@@ -14,14 +15,28 @@ public class OrderDto implements Serializable {
     //private CartDto cartDto;
 
 
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public long getOrderId() {
+    public String getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(long orderId) {
+    public void setOrderId(String orderId) {
         this.orderId = orderId;
+    }
+
+    public double getOrderAmount() {
+        return orderAmount;
+    }
+
+    public void setOrderAmount(double orderAmount) {
+        this.orderAmount = orderAmount;
     }
 
     public String getOrderStatus() {
@@ -32,13 +47,7 @@ public class OrderDto implements Serializable {
         this.orderStatus = orderStatus;
     }
 
-    public double getOrderAmount() {
-        return orderAmount;
-    }
 
-    public void setOrderAmount(int orderAmount) {
-        this.orderAmount = orderAmount;
-    }
 
     public AddressDto getShippingAddress() {
         return shippingAddress;

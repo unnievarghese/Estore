@@ -5,21 +5,33 @@ import com.example.Estore.Estore.Ui.Model.Response.UserRequest.AddressesRest;
 
 public class OrderResponseModel {
 
+    private static final long serialVersionUID = 1L;
 
-    private String orderId;
+
+
+    public Long orderId;
+    //public String orderId;
     private String orderStatus;
     private double orderAmount;
-    private AddressesRest shippingAddress;
     private AddressesRest billingAddress;
+    private AddressesRest shippingAddress;
 
-
-    public String getOrderId() {
+    public Long getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(String orderId) {
+    public void setOrderId(Long orderId) {
         this.orderId = orderId;
     }
+
+
+    //public String getOrderId() {
+    //    return orderId;
+    //}
+
+    //public void setOrderId(String orderId) {
+        //this.orderId = orderId;
+    //}
 
     public String getOrderStatus() {
         return orderStatus;
