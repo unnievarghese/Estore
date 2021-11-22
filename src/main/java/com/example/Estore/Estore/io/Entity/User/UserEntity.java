@@ -1,7 +1,11 @@
 package com.example.Estore.Estore.io.Entity.User;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -35,6 +39,11 @@ public class UserEntity implements Serializable {
     @OneToOne(mappedBy = "userCardDetails",cascade = CascadeType.ALL)
     private CardEntity cardDetails;
 
+    @ManyToMany(cascade = {CascadeType.ALL},fetch = FetchType.EAGER)
+    @JoinTable(name="user_roles",
+            joinColumns = @JoinColumn(name="user_id",referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id",referencedColumnName = "id"))
+    private Collection<RoleEntity> roles;
 
     public long getId() {
         return id;
@@ -122,5 +131,13 @@ public class UserEntity implements Serializable {
 
     public void setAddress(List<AddressEntity> address) {
         this.address = address;
+    }
+
+    public Collection<RoleEntity> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Collection<RoleEntity> roles) {
+        this.roles = roles;
     }
 }
