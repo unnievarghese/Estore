@@ -3,8 +3,12 @@ package com.example.Estore.Estore.io.Entity.WishList;
 import com.example.Estore.Estore.io.Entity.Product.ProductEntity;
 import com.example.Estore.Estore.io.Entity.User.UserEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,10 +22,18 @@ public class WishListEntity {
 
     private long wishListId;
 
+
+
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="product_id",referencedColumnName = "ProductId")
+
     @JsonIgnore
+    @Transient
     private ProductEntity productEntity;
+    @UpdateTimestamp
+    private LocalDateTime updatedTime;
+    @CreationTimestamp
+    private LocalDateTime createdTime;
+
     @ElementCollection
     private List<ProductEntity> productEntityList=new ArrayList<ProductEntity>();
 

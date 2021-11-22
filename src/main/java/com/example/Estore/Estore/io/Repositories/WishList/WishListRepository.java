@@ -16,6 +16,8 @@ public interface WishListRepository extends CrudRepository<WishListEntity,Long> 
 
     Optional<WishListEntity> findAllByUserEntity(UserEntity userEntity);
 
+    WishListEntity findAllByWishListId(Long wishListId);
+
     @Transactional
     @Modifying
     @Query(value = "DELETE FROM wishlist_product_entity_list w WHERE w.wish_list_entity_wish_list_id=?1 AND w.product_entity_list_product_id=?2",nativeQuery = true)

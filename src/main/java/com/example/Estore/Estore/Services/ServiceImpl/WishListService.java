@@ -9,7 +9,10 @@ import com.example.Estore.Estore.io.Repositories.User.UserRepository;
 import com.example.Estore.Estore.io.Repositories.WishList.WishListRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +26,13 @@ public class WishListService {
     @Autowired
     ProductRepository productRepository;
 
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public class BadRequestException extends Exception{
 
+        public BadRequestException(String message) {
+            super(message);
+        }
+    }
     public WishListEntity addProductToWishList(UserDto userDto, Long ProductId) throws Exception {
         UserEntity userEntity = new UserEntity();
         BeanUtils.copyProperties(userDto, userEntity);
@@ -42,7 +51,8 @@ public class WishListService {
             ProductEntity productEntity = productRepository.findById(ProductId).get();
             for (int i=0;i<wishlistEntity1.getProductEntityList().size();i++){
                 if(productEntity == wishlistEntity1.getProductEntityList().get(i)){
-                    throw new Exception("Product already exists");
+
+                    throw new BadRequestException("Product already exists");
                 }
 
             }
@@ -50,7 +60,7 @@ public class WishListService {
 
 
         }
-        return wishListRepository.save(wishlistEntity1);
+        return  wishListRepository.save(wishlistEntity1);
     }
 
 

@@ -56,14 +56,14 @@ public class ReviewController {
 
         }
     }
-    @GetMapping(path = "/get/all/{productId}")
+    @GetMapping(path = "/fetch/{productId}")
     public List<ReviewRest> getReviewByProduct(@PathVariable (value="productId") Long ProductId) throws Exception {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
         List<ReviewRest> reviewRest=reviewService.findReviewByProductId(ProductId,user);
         return reviewRest;
     }
-    @GetMapping(path = "/get/user-reviews/{id}")
+    @GetMapping(path = "/fetch-user/{id}")
     public List<ReviewRest> getReviewByUserId(@PathVariable (value="id") Long id) throws Exception {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());

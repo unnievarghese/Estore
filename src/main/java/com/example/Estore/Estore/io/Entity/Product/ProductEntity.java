@@ -1,5 +1,7 @@
 package com.example.Estore.Estore.io.Entity.Product;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -10,9 +12,7 @@ import java.io.Serializable;
 public class ProductEntity implements Serializable {
     @Id
     @GeneratedValue
-    private Long ProductId;
-
-
+    private Long productId;
     @Column(nullable = false)
     private String productName;
     private String description;
@@ -20,16 +20,30 @@ public class ProductEntity implements Serializable {
     private Integer price;
     @Column(nullable = false)
     private Integer quantity;
-
-
+//    @ManyToOne
+//    @JoinColumn(name = "categoryId")
+//    @JsonIgnore
+//    private CategoryEntity categoryDetails;
+//
+//    public CategoryEntity getCategoryDetails() {
+//        return categoryDetails;
+//    }
+//
+//    public void setCategoryDetails(CategoryEntity categoryDetails) {
+//        this.categoryDetails = categoryDetails;
+//    }
 
     public Long getProductId() {
-        return ProductId;
+        return productId;
     }
 
     public void setProductId(Long productId) {
-        ProductId = productId;
+        this.productId = productId;
     }
+
+//    @ManyToMany(mappedBy = "productEntityList", fetch = FetchType.LAZY)
+//    @JsonIgnore
+
 
     public String getProductName() {
         return productName;

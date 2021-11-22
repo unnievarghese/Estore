@@ -23,9 +23,9 @@ public class WishListController {
 
 
 
-    @PostMapping(path = "/add/{ProductId}")
-    public WishListRest addToWishlist(@PathVariable(value = "ProductId") Long ProductId) throws Exception {
-        if (ProductId==null)
+    @PostMapping(path = "/add/{productId}")
+    public WishListRest addToWishlist(@PathVariable(value = "productId") Long productId) throws Exception {
+        if (productId==null)
         {
             throw new Exception("product is null");
         }
@@ -33,7 +33,7 @@ public class WishListController {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             UserDto user = userService.getUser(auth.getName());
             //System.out.println(user.getUserId());
-            WishListEntity wishlistEntity = wishListService.addProductToWishList(user, ProductId);
+            WishListEntity wishlistEntity = wishListService.addProductToWishList(user, productId);
             return new ModelMapper().map(wishlistEntity, WishListRest.class);
         }
 

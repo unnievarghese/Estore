@@ -12,7 +12,9 @@ import com.example.Estore.Estore.io.Repositories.Review.ReviewRepository;
 import com.example.Estore.Estore.io.Repositories.User.UserRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,20 @@ public class ReviewServiceImpl {
     @Autowired
     ReviewRepository reviewRepository;
 
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public class BadRequestException extends Exception {
+
+        public BadRequestException(String message) {
+            super(message);
+        }
+    }
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public class NotFoundException extends Exception {
+
+        public NotFoundException(String message) {
+            super(message);
+        }
+    }
 
     public ReviewRest createReviewByUserId(ReviewRequestModel reviewRequestModel, UserDto user) throws Exception {
         UserEntity userEntity = new UserEntity();
@@ -34,12 +50,17 @@ public class ReviewServiceImpl {
         ReviewEntity reviewEntity = new  ReviewEntity();
         BeanUtils.copyProperties(reviewRequestModel, reviewEntity);
         Optional<ReviewEntity>optionalReviewEntity=reviewRepository.findByProductIdAndUserId(reviewRequestModel.getProductId(),user.getId());
-        Optional<ProductEntity> optionalProductEntity=productRepository.findById(reviewRequestModel.getProductId());
+        //Optional<ProductEntity> optionalProductEntity=productRepository.findById(reviewRequestModel.getProductId());
+
 
         ProductEntity productEntity = productRepository.findById(reviewRequestModel.getProductId()).get();
-        if (optionalProductEntity.isEmpty() )
+//        if (optionalProductEntity.isEmpty())
+//        {
+//            throw new NotFoundException("Product does not exist");
+//        }
+         if (reviewRequestModel.getRating()>5)
         {
-            throw new Exception("Cannot make a review");
+            throw new BadRequestException("Invalid Rating");
         }
         else if (optionalReviewEntity.isEmpty()){
 
@@ -59,7 +80,7 @@ public class ReviewServiceImpl {
             return reviewRest;
         }
         else {
-            throw new Exception("review already exists");
+            throw new BadRequestException("review already exists");
         }
     }
 
@@ -106,7 +127,7 @@ public class ReviewServiceImpl {
      List<ReviewEntity> reviewEntityList=reviewRepository.findByProductId(productId);
      if (reviewEntityList.isEmpty())
      {
-         throw new Exception("There is no review");
+         throw new NotFoundException("There is no review");
      }
      else{
          List<ReviewRest> reviewRests=new ArrayList<>();
@@ -125,7 +146,7 @@ public class ReviewServiceImpl {
         List<ReviewEntity>reviewEntityList=reviewRepository.findReviewByUser(user.getId());
         if ((reviewEntityList.isEmpty()))
         {
-            throw new Exception("no reviews by the user");
+            throw new NotFoundException("no reviews by the user");
         }
         else {
             List<ReviewRest>reviewRests=new ArrayList<>();

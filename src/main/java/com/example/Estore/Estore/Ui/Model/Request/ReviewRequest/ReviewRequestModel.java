@@ -2,7 +2,6 @@ package com.example.Estore.Estore.Ui.Model.Request.ReviewRequest;
 
 public class ReviewRequestModel {
     private Long productId;
-    private String productName;
     private Integer rating;
     private String review;
 

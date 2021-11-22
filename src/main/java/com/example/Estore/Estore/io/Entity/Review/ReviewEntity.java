@@ -4,8 +4,11 @@ package com.example.Estore.Estore.io.Entity.Review;
 import com.example.Estore.Estore.io.Entity.Product.ProductEntity;
 import com.example.Estore.Estore.io.Entity.User.UserEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "review")
@@ -15,6 +18,10 @@ public class ReviewEntity {
     private Long reviewId;
     private String review;
     private Integer rating;
+    @UpdateTimestamp
+    private LocalDateTime updatedTime;
+    @CreationTimestamp
+    private LocalDateTime createdTime;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="product_id",referencedColumnName = "ProductId")
     @JsonIgnore
