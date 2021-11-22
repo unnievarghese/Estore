@@ -1,11 +1,22 @@
 package com.example.Estore.Estore.Ui.Model.Request.ProductRequest;
 
+import com.example.Estore.Estore.io.Entity.Product.CategoryEntity;
+
 public class ProductRequestModel {
 
     private String productName;
     private String description;
     private int price;
     private int quantity;
+    private String categoryName;
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
 
     public String getProductName() {
         return productName;
@@ -38,4 +49,5 @@ public class ProductRequestModel {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+
 }

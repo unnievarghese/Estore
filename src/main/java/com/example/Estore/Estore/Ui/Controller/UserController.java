@@ -25,6 +25,11 @@ public class UserController {
         return "get product was called";
     }
 
+    @GetMapping
+    public String getuser(){
+        return "this is get";
+    }
+
     @PostMapping(path="/create-user")
     public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) throws Exception {
         if(userDetails.getFirstName().isEmpty()) throw new NullPointerException("The Object is Null");

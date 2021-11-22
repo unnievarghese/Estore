@@ -1,12 +1,22 @@
 package com.example.Estore.Estore.Ui.Controller;
 import com.example.Estore.Estore.Services.ProductService;
 import com.example.Estore.Estore.Shared.dto.Product.ProductDto;
+import com.example.Estore.Estore.Ui.Model.Request.ProductRequest.CategoryRequestModel;
 import com.example.Estore.Estore.Ui.Model.Request.ProductRequest.ProductRequestModel;
+import com.example.Estore.Estore.Ui.Model.Response.ProductRequest.CategoryRest;
 import com.example.Estore.Estore.Ui.Model.Response.ProductRequest.ProductRest;
 
+import com.example.Estore.Estore.io.Entity.Product.CategoryEntity;
+import com.example.Estore.Estore.io.Entity.Product.ProductEntity;
+import com.example.Estore.Estore.io.Entity.User.UserEntity;
+import com.example.Estore.Estore.io.Repositories.Product.ProductRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(path="products")
@@ -14,15 +24,20 @@ public class ProductController {
 
     @Autowired
     ProductService productService;
-    @GetMapping
-public String getProduct()
-    {
-        return "get product was called";
+    @GetMapping(path = "/get-products")
+    public ResponseEntity<ProductEntity> getProducts(){
+        List<ProductEntity> productEntityList = productService.getProducts();
+        return new ResponseEntity(productEntityList,HttpStatus.OK);
     }
-    @PostMapping
-    public ProductRest createProduct(@RequestBody ProductRequestModel productDetails) throws Exception{
-        System.out.println("product");
-        if (productDetails.getProductName().isEmpty())throw new Exception("Product Not Found");
+    @GetMapping(path = "/find/{id}")
+    public ResponseEntity<ProductEntity> getProductById(@PathVariable("id")Long productId){
+        ProductEntity productEntityList = productService.findByProductId(productId);
+        return new ResponseEntity(productEntityList,HttpStatus.FOUND);
+    }
+
+    @PostMapping(path="/create")
+    public ProductRest createProduct(@RequestBody ProductRequestModel productDetails){
+
         ModelMapper modelMapper = new ModelMapper();
         ProductDto productDto = modelMapper.map(productDetails,ProductDto.class);
 
@@ -32,15 +47,26 @@ public String getProduct()
 
     }
 
-    @PutMapping
-    public String updateProduct()
-    {
-        return "update product was called";
+    @PutMapping(path ="/update/{id}")
+
+    public ProductRest updateProduct(@PathVariable("id") Long productId,@RequestBody ProductRequestModel productDetails)
+            throws Exception {
+
+        ProductEntity updateProduct = productService.updateProduct(productId,productDetails);
+                return new ModelMapper().map(updateProduct,ProductRest.class);
+
     }
-    @DeleteMapping
-    public String deleteProduct()
+
+    @DeleteMapping(path="/delete/{id}")
+    public  ResponseEntity deleteProduct(@PathVariable ("id")Long productId) throws Exception {
+        productService.deleteProduct(productId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    @PostMapping(path="/category-add")
+    public CategoryRest addCategory(@RequestBody CategoryRequestModel categoryRequestModel)
     {
-        return "delete product was called";
+        CategoryRest category = productService.addCategory(categoryRequestModel);
+        return category;
     }
 
 
