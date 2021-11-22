@@ -161,17 +161,70 @@ import java.util.Optional;
     }
 
 
+    public List<OrderResponseModel> findByorderId(UserDto user, Long id) throws Exception  {
+
+        //UserEntity userEntity = userRepository.findByUserId(user.getUserId());
+        List<OrderEntity>orderEntityList=orderRepository.findByOrderId(id);
+        if ((orderEntityList.isEmpty()))
+        {
+            throw new Exception("no orders by the orderId");
+        }
+        else {
+            List<OrderResponseModel>orders=new ArrayList<>();
+            for (OrderEntity orderEntity:orderEntityList)
+            {
+                OrderResponseModel order=new OrderResponseModel();
+                // orderEntity.setShippingAddress(userEntity.getAddress().get(0));
+
+                // order.setShippingAddress(orderEntity.getShippingAddress());
+                //BeanUtils.copyProperties(orderEntity,order);
+                // orders.add(order);
+                orders.add(new ModelMapper().map(orderEntity,OrderResponseModel.class));
+            }
+            return  orders;
+        }
+    }
+
+
+    public List<OrderResponseModel> findByorderStatus(UserDto user, String id) throws Exception  {
+        String id1=id.toLowerCase();
+
+        System.out.println(id1);
+        //UserEntity userEntity = userRepository.findByUserId(user.getUserId());
+        List<OrderEntity>orderEntityList=orderRepository.findByOrderStatusandUserId(user.getId(),id1);
+        if ((orderEntityList.isEmpty()))
+        {
+            throw new Exception("no status by the given status");
+        }
+        else {
+            List<OrderResponseModel>orders=new ArrayList<>();
+            for (OrderEntity orderEntity:orderEntityList)
+            {
+                OrderResponseModel order=new OrderResponseModel();
+                // orderEntity.setShippingAddress(userEntity.getAddress().get(0));
+
+                // order.setShippingAddress(orderEntity.getShippingAddress());
+                //BeanUtils.copyProperties(orderEntity,order);
+                // orders.add(order);
+                orders.add(new ModelMapper().map(orderEntity,OrderResponseModel.class));
+            }
+            return  orders;
+        }
+    }
+
+
 
 
 
     public OrderEntity updateOrderStatus(UserDto user, Long orderId, String status) throws Exception {
+
+            String status1=status.toLowerCase();
 
         //UserEntity userEntity = userRepository.findByUserId(userId);
 
 
         // if (!user.getUserId().equals("seller"))
         //    throw new IllegalStateException(orderId + "cannot update");
-
        // String status1 = status.toLowerCase();
 //        if (!status1.equals("shipped") && !status1.equals("in-transit") && !status1.equals("delivered"))
 //            throw new IllegalStateException("Invalid update");
@@ -179,15 +232,15 @@ import java.util.Optional;
         //UserEntity userEntity= new UserEntity();
         //BeanUtils.copyProperties(user,userEntity);
 
-
+        System.out.println(status1);
         //finding order by orderid
         OrderEntity orderEntity=orderRepository.findByorderId(orderId);
 
-        if(orderEntity.getOrderStatus().equals(status))
+        if(orderEntity.getOrderStatus().equals(status1))
             throw new IllegalStateException("The order is already with the same status");
 
         //updating order status
-        orderEntity.setOrderStatus(status);
+        orderEntity.setOrderStatus(status1);
         orderRepository.save(orderEntity);
         return orderEntity;
 

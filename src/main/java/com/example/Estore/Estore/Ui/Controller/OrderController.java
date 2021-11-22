@@ -100,6 +100,23 @@ public class OrderController {
         return order;
     }
 
+    @GetMapping(path = "/get/{orderId}")
+    public List<OrderResponseModel> getOrderById(@PathVariable (value="orderId") Long orderId) throws Exception {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserDto user = userService.getUser(auth.getName());
+        List<OrderResponseModel> order=orderService.findByorderId(user,orderId);
+        return order;
+    }
+
+    @GetMapping(path = "/get")
+    public List<OrderResponseModel> getOrderByStatus(@RequestParam (value="status") String orderStatus) throws Exception {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserDto user = userService.getUser(auth.getName());
+        List<OrderResponseModel> order=orderService.findByorderStatus(user,orderStatus);
+        return order;
+    }
+
+
 
 
 
