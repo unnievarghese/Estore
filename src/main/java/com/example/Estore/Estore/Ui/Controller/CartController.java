@@ -6,7 +6,9 @@ import com.example.Estore.Estore.Ui.Model.Response.CartRequest.CartItemRest;
 import com.example.Estore.Estore.Ui.Model.Response.OperationStatusModel;
 import com.example.Estore.Estore.Ui.Model.Response.RequestOperationName;
 import com.example.Estore.Estore.Ui.Model.Response.RequestOperationStatus;
+import com.example.Estore.Estore.Ui.Model.Response.WishListRequest.WishListRest;
 import com.example.Estore.Estore.io.Entity.Cart.CartItemEntity;
+import com.example.Estore.Estore.io.Entity.User.UserEntity;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -22,9 +24,9 @@ public class CartController {
     @Autowired
     UserService userService;
 
-//  http://localhost:8080/Estore/cart/add/{productId}?quantity={?}
+//  http://localhost:8080/Estore/cart/addProduct/{productId}?quantity={?}
 
-    @PostMapping(path = "/add/{productId}")
+    @PostMapping(path = "/addProduct/{productId}")
     public CartItemRest addCartItem(@PathVariable(value = "productId") Long productId,
                                     @RequestParam(value = "quantity") Integer quantity) throws Exception {
         if (productId == null || !(quantity > 0)) {
@@ -36,24 +38,24 @@ public class CartController {
             return new ModelMapper().map(cartItemEntity, CartItemRest.class);
         }
     }
-//  http://localhost:8080/Estore/cart/get
+//  http://localhost:8080/Estore/cart/fetch
 
-    @GetMapping(path = "/get")
+    @GetMapping(path = "/fetch")
     public List<CartItemEntity> getCartById() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
-        System.out.println(user.getId());
         List<CartItemEntity> cartItemEntityList = cartService.findByUserId(user);
         return cartItemEntityList;
 
     }
-//  http://localhost:8080/Estore/cart/delete/{productId}
+//  http://localhost:8080/Estore/cart/deleteProduct/{productId}
 
-    @DeleteMapping(path = "/delete/{productId}")
+    @DeleteMapping(path = "/deleteProduct/{productId}")
     public OperationStatusModel removeProduct(@PathVariable(value = "productId") Long productId) throws Exception {
         if (productId == null) {
             throw new Exception("Record with given " + productId + " is not found");
         } else {
+
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             UserDto user = userService.getUser(auth.getName());
             OperationStatusModel returnValue = new OperationStatusModel();
@@ -64,21 +66,47 @@ public class CartController {
 
         }
     }
-//    http://localhost:8080/Estore/cart/update/{productId}?quantity={count}
-//    http://localhost:8080/Estore/cart/update/{productId}?reduceQuantity={count}
+//  http://localhost:8080/Estore/cart/product/addQuantity/{productId}?quantity={count}
 
-    @PutMapping("/update/{productId}")
-    public String updateCartItem(@PathVariable(value = "productId") Long productId,
-                                                         @RequestParam(value = "quantity",defaultValue = "0") Integer quantity,
-                                          @RequestParam(value = "reduceQuantity",defaultValue = "0") Integer reducequantity) throws Exception{
-        if (productId == null) {
-            throw new Exception("Record with given is not found");
-        }
+    @PutMapping("product/addQuantity/{productId}")
+    public String addQuantity(@PathVariable(value = "productId") Long productId,
+                                                         @RequestParam(value = "quantity",defaultValue = "0") Integer quantity)throws Exception{
+
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
 
-        return cartService.updateCartItem(user, productId, quantity,reducequantity);
+        return cartService.addQuantity(user, productId, quantity);
     }
+
+//   http://localhost:8080/Estore/cart/product/reduceQuantity/{productId}?quantity={count}
+
+    @PutMapping("product/reduceQuantity/{productId}")
+    public String reduceQuantity(@PathVariable(value = "productId") Long productId,
+                              @RequestParam(value = "quantity",defaultValue = "0") Integer quantity) throws Exception{
+
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserDto user = userService.getUser(auth.getName());
+
+        return cartService.reduceQuantity(user, productId, quantity);
+    }
+
+
+//    http://localhost:8080/Estore/cart/addWishlist/{wishlistid}?quantity={count}
+
+    @PostMapping(path = "/addWishlist/{wishlistid}")
+    public String addWishlistToCart(@PathVariable(value = "wishlistid")long wishlistid,
+                                          @RequestParam(value = "quantity",defaultValue = "0") Integer quantity){
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserDto user = userService.getUser(auth.getName());
+
+        String wishListRest=cartService.addWishlistToCart(user,wishlistid,quantity);
+        return wishListRest;
+
+    }
+
 }
 
 

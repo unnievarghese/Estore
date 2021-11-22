@@ -19,16 +19,10 @@ public class WishListEntity {
     private long wishListId;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="product_id",referencedColumnName = "ProductId")
     @JsonIgnore
     private ProductEntity productEntity;
     @ElementCollection
     private List<ProductEntity> productEntityList=new ArrayList<ProductEntity>();
-
-
-
-
-
     @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id",referencedColumnName = "userId")

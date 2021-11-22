@@ -72,10 +72,6 @@ public class WishListService {
         Long wishListId=wishListEntity1.getWishListId();
         wishListRepository.deleteProduct(wishListId,productId);
 
-
-
-
-
         return null;
     }
     }
