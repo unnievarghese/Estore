@@ -5,17 +5,11 @@ import java.util.List;
 public class UserDetailsRequestModel {
 
     private String firstName;
-
     private String lastName;
-
     private Long phoneNumber;
-
     private String email;
-
     private String password;
-
     private CardRequestModel cardDetails;
-
     private List<AddressRequestModel> address;
 
     public String getFirstName() {

@@ -1,5 +1,7 @@
 package com.example.Estore.Estore.Security;
 
+import com.example.Estore.Estore.io.Entity.User.UserEntity;
+import com.example.Estore.Estore.io.Repositories.User.UserRepository;
 import io.jsonwebtoken.Jwts;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,8 +16,10 @@ import java.util.ArrayList;
 
 public class AuthorizationFilter extends BasicAuthenticationFilter {
 
-    public AuthorizationFilter(AuthenticationManager authManager) {
+    private final UserRepository userRepository;
+    public AuthorizationFilter(AuthenticationManager authManager, UserRepository userRepository) {
         super(authManager);
+        this.userRepository = userRepository;
     }
     @Override
     protected void doFilterInternal(HttpServletRequest req,
@@ -43,7 +47,10 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
                     .getSubject();
 
             if (user != null) {
-                return  new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+                UserEntity userEntity = userRepository.findByEmail(user);
+                UserPrincipal userPrincipal =new UserPrincipal(userEntity);
+                return  new UsernamePasswordAuthenticationToken(user, null,
+                                                                userPrincipal.getAuthorities());
             }
             return null;
         }

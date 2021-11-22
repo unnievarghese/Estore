@@ -5,6 +5,8 @@ import com.example.Estore.Estore.Services.UserService;
 import com.example.Estore.Estore.Shared.dto.User.UserDto;
 import com.example.Estore.Estore.Ui.Model.Response.WishListRequest.WishListRest;
 import com.example.Estore.Estore.io.Entity.WishList.WishListEntity;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -22,7 +24,11 @@ public class WishListController {
     WishListService wishListService;
 
 
-
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
     @PostMapping(path = "/add/{productId}")
     public WishListRest addToWishlist(@PathVariable(value = "productId") Long productId) throws Exception {
         if (productId==null)
