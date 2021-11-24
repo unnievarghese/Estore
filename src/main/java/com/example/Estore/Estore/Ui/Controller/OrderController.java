@@ -11,6 +11,8 @@ import com.example.Estore.Estore.io.Entity.Cart.CartItemEntity;
 import com.example.Estore.Estore.io.Entity.Order.OrderEntity;
 import com.example.Estore.Estore.io.Entity.User.UserEntity;
 import com.example.Estore.Estore.io.Repositories.User.UserRepository;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +43,13 @@ public class OrderController {
     @Autowired
     UserRepository userRepository;
 
-    //http://localhost:8080/orders
-    @PostMapping
+    //http://localhost:8080/estore/orders/create
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
+    @PostMapping(path = "/create")
     public OrderResponseModel createOrder() throws Exception {
 
 
@@ -58,8 +65,13 @@ public class OrderController {
 
     }
 
-    //http://localhost:8080/orders/productId
-    @PostMapping(path = "/{productId}")
+    //http://localhost:8080/estore/orders/create/productId
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
+    @PostMapping(path = "/create/{productId}")
     public OrderResponseModel createOrderByProductId(@PathVariable Long productId) throws Exception {
 
 
@@ -92,6 +104,13 @@ public class OrderController {
 //
 //    }
 
+
+    //http://localhost:8080/estore/orders
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
     @GetMapping
     public List<OrderResponseModel> getOrderByUser() throws Exception{
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -100,15 +119,27 @@ public class OrderController {
         return order;
     }
 
-    @GetMapping(path = "/get/{orderId}")
-    public List<OrderResponseModel> getOrderById(@PathVariable (value="orderId") Long orderId) throws Exception {
+    //http://localhost:8080/estore/orders/orderId
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
+    @GetMapping(path = "/{orderId}")
+    public List<OrderResponseModel> getOrderByorderId(@PathVariable (value="orderId") Long orderId) throws Exception {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
         List<OrderResponseModel> order=orderService.findByorderId(user,orderId);
         return order;
     }
 
-    @GetMapping(path = "/get")
+    //http://localhost:8080/estore/orders/filter?status=shipped
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
+    @GetMapping(path = "/filter")
     public List<OrderResponseModel> getOrderByStatus(@RequestParam (value="status") String orderStatus) throws Exception {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
@@ -124,7 +155,12 @@ public class OrderController {
 
 
 
-    //http://localhost:8080/orders/1?status=Shipped
+    //http://localhost:8080/estore/orders/1?status=Shipped
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
     @PutMapping(path = "/{orderId}")
     public OrderResponseModel updateOrderStatus(@PathVariable Long orderId, @RequestParam(value = "status") String status) throws Exception {
 
@@ -144,10 +180,14 @@ public class OrderController {
 
 
 
-
-
+    //http://localhost:8080/estore/orders/cancel/orderId
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
     @DeleteMapping(path="/cancel/{orderId}")
-    public void deleteCart(@PathVariable(value = "orderId") Long orderId) throws Exception{
+    public void cancelByorderId(@PathVariable(value = "orderId") Long orderId) throws Exception{
 
 
         if (orderId == null) {

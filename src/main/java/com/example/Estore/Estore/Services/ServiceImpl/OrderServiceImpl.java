@@ -15,7 +15,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,6 +51,7 @@ import java.util.Optional;
 
             OrderEntity orderEntity = new OrderEntity();
 
+
             //setting the user address to order
             orderEntity.setShippingAddress(userEntity.getAddress().get(0));
 
@@ -60,17 +63,38 @@ import java.util.Optional;
 
             //finding total amount and setting
             List<CartItemEntity> cartItemEntity = cartItemRepository.findByUserEntity(userEntity);
+
+
+            //orderEntity.setCartitemEntity(cartItemEntity);
+
+
+            //orderEntity.setCartitemEntity(cartItemEntity);
+
+
             double totalamount=0;
+
 
             for(CartItemEntity item :cartItemEntity){
 
+
                 //checking cart status
-                if(item.isCartIsActive())
-                 totalamount+=item.getTotalPrice();
+                if(item.isCartIsActive()) {
+
+
+                    totalamount += item.getTotalPrice();
+                    orderEntity.getCartitemEntityList().add(item);
+
+
+                }
                 item.setCartIsActive(false);//making cart status false
+
 
             }
             orderEntity.setOrderAmount(totalamount);
+
+            //setting ordered date
+            orderEntity.setOrderedTime(LocalDateTime.now());
+
             orderEntity.setUserEntity(userEntity);
 
 
@@ -108,10 +132,17 @@ import java.util.Optional;
             //checking cart status
         //if(cartItemEntity.isCartIsActive())
          totalamount=cartItemEntity.getTotalPrice();
+
+        orderEntity.getCartitemEntityList().add(cartItemEntity);
+
         cartItemEntity.setCartIsActive(false);//making cart status false
 
 
         orderEntity.setOrderAmount(totalamount);
+        orderEntity.setOrderedTime(LocalDateTime.now());
+        orderEntity.setUserEntity(userEntity);
+
+
 
 
 

@@ -1,19 +1,61 @@
 package com.example.Estore.Estore.Shared.dto.Order;
 
+import com.example.Estore.Estore.Shared.dto.Cart.CartItemDto;
 import com.example.Estore.Estore.Shared.dto.User.AddressDto;
+import com.example.Estore.Estore.Shared.dto.User.UserDto;
+import com.example.Estore.Estore.io.Entity.Cart.CartItemEntity;
+import com.example.Estore.Estore.io.Entity.User.UserEntity;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
 
 public class OrderDto implements Serializable {
 
     public Long id;
-    private String orderId;
     private String orderStatus;
     private double orderAmount;
     private AddressDto shippingAddress;
     private AddressDto billingAddress;
-    //private CartDto cartDto;
+    private UserDto userEntity;
+    private LocalDateTime orderedTime;
+    private LocalDateTime updatedTime;
+    private List<CartItemDto> cartitemEntityList;
 
+
+    public List<CartItemDto> getCartitemEntityList() {
+        return cartitemEntityList;
+    }
+
+    public void setCartitemEntityList(List<CartItemDto> cartitemEntityList) {
+        this.cartitemEntityList = cartitemEntityList;
+    }
+
+    public UserDto getUserEntity() {
+        return userEntity;
+    }
+
+    public void setUserEntity(UserDto userEntity) {
+        this.userEntity = userEntity;
+    }
+
+    public LocalDateTime getOrderedTime() {
+        return orderedTime;
+    }
+
+    public void setOrderedTime(LocalDateTime orderedTime) {
+        this.orderedTime = orderedTime;
+    }
+
+    public LocalDateTime getUpdatedTime() {
+        return updatedTime;
+    }
+
+    public void setUpdatedTime(LocalDateTime updatedTime) {
+        this.updatedTime = updatedTime;
+    }
 
     public Long getId() {
         return id;
@@ -21,14 +63,6 @@ public class OrderDto implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
     }
 
     public double getOrderAmount() {

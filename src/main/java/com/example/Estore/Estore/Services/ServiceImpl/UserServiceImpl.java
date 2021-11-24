@@ -74,7 +74,7 @@ public class UserServiceImpl implements UserService {
 
         UserEntity storedUserDetails = userRepository.save(userEntity);
 
-        String link = "http://localhost:8080/Estore/home/email-verification?token="
+        String link = "http://localhost:8080/estore/home/email/verify?token="
                 +userEntity.getEmailVerificationToken();
         EmailBuilder emailBuilder = new EmailBuilder();
         emailService.send(userEntity.getEmail(),emailBuilder.
@@ -117,7 +117,7 @@ public class UserServiceImpl implements UserService {
         passwordResetTokenEntity.setUserDetails(userEntity);
         passwordResetTokenRepository.save(passwordResetTokenEntity);
 
-        String link = "http://localhost:8080/Estore/home/password-reset?token="
+        String link = "http://localhost:8080/estore/home/password/create?token="
                 +passwordResetTokenEntity.getToken();
 
         EmailBuilder emailBuilder = new EmailBuilder();
@@ -136,6 +136,7 @@ public class UserServiceImpl implements UserService {
         }
 
         UserEntity userEntity = passwordResetTokenEntity.getUserDetails();
+        System.out.println(userEntity.getEmail());
         userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(password1));
         userRepository.save(userEntity);
         returnValue = true;
