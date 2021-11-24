@@ -5,15 +5,15 @@ import com.example.Estore.Estore.Shared.dto.Product.ProductDto;
 import com.example.Estore.Estore.Ui.Model.Request.ProductRequest.CategoryRequestModel;
 import com.example.Estore.Estore.Ui.Model.Request.ProductRequest.ProductRequestModel;
 import com.example.Estore.Estore.Ui.Model.Response.ProductRequest.CategoryRest;
-import com.example.Estore.Estore.Ui.Model.Response.ProductRequest.ErrorMessages;
 import com.example.Estore.Estore.io.Entity.Product.CategoryEntity;
 import com.example.Estore.Estore.io.Entity.Product.ProductEntity;
 import com.example.Estore.Estore.io.Repositories.Product.CategoryRepository;
 import com.example.Estore.Estore.io.Repositories.Product.ProductRepository;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.List;
 
@@ -35,7 +35,6 @@ public class ProductServiceImpl implements ProductService {
         return returnValue;
     }
 
-    @Override
     public List<ProductEntity> getProducts() {
         return (List<ProductEntity>) productRepository.findAll();
     }
@@ -58,7 +57,7 @@ public class ProductServiceImpl implements ProductService {
 
        ProductEntity product = productRepository.findByProductId(productId);
 
-       if (product.getProductId().equals(null)) throw new Exception(String.valueOf(ErrorMessages.NO_RECORD_FOUND));
+       if (product.getProductId().equals(null)) throw new RuntimeException("product not found");
 
        else
 

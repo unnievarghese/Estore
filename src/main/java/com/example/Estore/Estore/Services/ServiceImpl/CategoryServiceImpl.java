@@ -25,7 +25,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<ProductEntity> getproducts(String name) {
+    public List<ProductEntity> getproductsByName(String name) {
         List<CategoryEntity> category = categoryRepository.findAll();
               List<ProductEntity> productEntity = new ArrayList<>();
         for(CategoryEntity i: category){
