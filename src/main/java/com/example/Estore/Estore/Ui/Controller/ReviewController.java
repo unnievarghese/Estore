@@ -9,6 +9,8 @@ import com.example.Estore.Estore.Ui.Model.Response.ReviewRequest.ReviewRest;
 
 import com.example.Estore.Estore.io.Entity.Review.ReviewEntity;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,11 @@ public class ReviewController {
     UserService userService;
     @Autowired
     ReviewServiceImpl reviewService;
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
     @PostMapping
     public ResponseEntity<ReviewRest> createReview(@RequestBody ReviewRequestModel reviewRequestModel) throws Exception {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -33,7 +40,11 @@ public class ReviewController {
         return new ResponseEntity(reviewService.createReviewByUserId(reviewRequestModel,user), HttpStatus.CREATED);
     }
 
-
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
     @PutMapping(path = "/update")
     public ResponseEntity<ReviewRest> updateReview(@RequestBody ReviewRequestModel reviewRequestModel){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -42,6 +53,11 @@ public class ReviewController {
 
 
     }
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
     @DeleteMapping("/delete/{productId}")
     public String deleteReview(@PathVariable (value="productId") Long ProductId) throws Exception {
         if (ProductId == null) {
@@ -56,6 +72,11 @@ public class ReviewController {
 
         }
     }
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
     @GetMapping(path = "/fetch/{productId}")
     public List<ReviewRest> getReviewByProduct(@PathVariable (value="productId") Long ProductId) throws Exception {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -63,6 +84,11 @@ public class ReviewController {
         List<ReviewRest> reviewRest=reviewService.findReviewByProductId(ProductId,user);
         return reviewRest;
     }
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
     @GetMapping(path = "/fetch-user/{id}")
     public List<ReviewRest> getReviewByUserId(@PathVariable (value="id") Long id) throws Exception {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

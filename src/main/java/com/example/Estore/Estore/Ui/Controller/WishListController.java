@@ -46,7 +46,11 @@ public class WishListController {
     }
 
 
-
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
     @GetMapping(path = "/get")
     public Optional<WishListEntity> getWishlistItems()
     {
@@ -57,20 +61,11 @@ public class WishListController {
 
     }
 
-//    @DeleteMapping(path = "delete/{wishListId}")
-//    public String deleteProductFromWishList(@PathVariable(value="ProductId") Long ProductId) {
-//        if (ProductId==null)
-//        {
-//            return "Product not found";
-//        }
-//        else {
-//            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//            UserDto user = userService.getUser(auth.getName());
-//            wishListService.deleteProductFromWishlist(user.getId(),ProductId);
-//
-//            return "Successfully deleted";
-//        }
-//    }
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
     @DeleteMapping(path = "/delete/{ProductId}")
     public String deleteProduct(@PathVariable (value="ProductId") Long ProductId) throws Exception {
         if (ProductId == null) {
