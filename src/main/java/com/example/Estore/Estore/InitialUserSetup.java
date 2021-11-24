@@ -41,7 +41,7 @@ public class InitialUserSetup {
         RoleEntity roleSeller=createRole("ROLE_SELLER",Arrays.asList(readAuthority,writeAuthority,deleteAuthority));
 
         UserEntity adminUser = userRepository.findByEmail("admin@gmail.com");
-        if (adminUser.getRoles() != null) return;
+        if (!adminUser.getRoles().isEmpty()) return;
         Collection<RoleEntity> arrayList = new ArrayList<RoleEntity>();
         arrayList.add(roleAdmin);
         adminUser.setRoles(arrayList);
