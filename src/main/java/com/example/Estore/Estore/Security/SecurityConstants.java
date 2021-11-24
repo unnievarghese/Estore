@@ -12,6 +12,8 @@ public class SecurityConstants {
     public static final String VERIFICATION_EMAIL_URL = "/home/email/verify";
     public static final String PASSWORD_RESET_REQUEST_URL = "/home/password/reset";
     public static final String PASSWORD_RESET_URL = "/home/password/create";
+    public static final String USER_CREATE_EMAIL_LINK = "http://localhost:8080/estore/home/email/verify?token=";
+    public static final String PASSWORD_EMAIL_LINK = "http://localhost:8080/estore/home/password/create?token=";
 
 
     public static String getTokenSecret(){

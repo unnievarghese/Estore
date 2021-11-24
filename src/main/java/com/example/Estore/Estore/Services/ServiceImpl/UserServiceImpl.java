@@ -1,11 +1,14 @@
 package com.example.Estore.Estore.Services.ServiceImpl;
 
+import com.example.Estore.Estore.Exception.ClientSideException;
+import com.example.Estore.Estore.Security.SecurityConstants;
 import com.example.Estore.Estore.Services.EmailService;
 import com.example.Estore.Estore.Services.UserService;
 import com.example.Estore.Estore.Shared.dto.*;
 import com.example.Estore.Estore.Shared.dto.User.AddressDto;
 import com.example.Estore.Estore.Shared.dto.User.CardDto;
 import com.example.Estore.Estore.Shared.dto.User.UserDto;
+import com.example.Estore.Estore.Ui.Model.Response.Messages;
 import com.example.Estore.Estore.io.Entity.User.*;
 import com.example.Estore.Estore.io.Repositories.User.AddressRepository;
 import com.example.Estore.Estore.io.Repositories.User.PasswordResetTokenRepository;
@@ -24,6 +27,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -48,8 +52,10 @@ public class UserServiceImpl implements UserService {
     AddressRepository addressRepository;
 
     @Override
-    public UserDto createUser(UserDto user) {
-        if(userRepository.findByEmail(user.getEmail()) != null) throw new RuntimeException("Record Already Exixts");
+    public UserDto createUser(UserDto user){
+        if(userRepository.findByEmail(user.getEmail()) != null)
+            throw new ClientSideException(Messages.RECORD_ALREADY_EXISTS.getMessage());
+
         for (int i=0;i<user.getAddress().size();i++) {
             AddressDto addressDto = user.getAddress().get(i);
             addressDto.setUserDetails(user);
@@ -70,12 +76,12 @@ public class UserServiceImpl implements UserService {
         arrayList.add(roleEntity);
         userEntity.setRoles(arrayList);
 
-        userEntity.setEmailVerificationToken(utils.generateEmailVerificationToken(userEntity.getUserId()));
+        String token = utils.generateEmailVerificationToken(userEntity.getUserId());
+        userEntity.setEmailVerificationToken(token);
 
         UserEntity storedUserDetails = userRepository.save(userEntity);
 
-        String link = "http://localhost:8080/estore/home/email/verify?token="
-                +userEntity.getEmailVerificationToken();
+        String link = SecurityConstants.USER_CREATE_EMAIL_LINK+token;
         EmailBuilder emailBuilder = new EmailBuilder();
         emailService.send(userEntity.getEmail(),emailBuilder.
                 buildRegistrationContent(userEntity.getFirstName(),link));
@@ -85,31 +91,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean verifyEmailToken(String token) {
-        boolean returnValue = false;
-
         UserEntity userEntity = userRepository.findByEmailVerificationToken(token);
+        if (userEntity == null)
+            throw new ClientSideException(Messages.TOKEN_NOT_FOUND.getMessage());
 
-        if(userEntity != null){
-            boolean hastokenExpired = Utils.hasTokenExpired(token);
-            if(!hastokenExpired){
-                userEntity.setEmailVerificationToken(null);
-                userEntity.setEmailVerificationStatus(Boolean.TRUE);
-                userRepository.save(userEntity);
-                returnValue = true;
-            }
-        }
-        return returnValue;
+        if(Utils.hasTokenExpired(token)) throw new ClientSideException((Messages.TOKEN_EXPIRED.getMessage()));
+        userEntity.setEmailVerificationToken(null);
+        userEntity.setEmailVerificationStatus(Boolean.TRUE);
+        userRepository.save(userEntity);
+        return true;
     }
 
     @Override
     public Boolean requestPasswordReset(String email) {
-        Boolean returnValue =false;
 
         UserEntity userEntity = userRepository.findByEmail(email);
+        if(userEntity == null)
+            throw new ClientSideException(Messages.EMAIL_NOT_FOUND.getMessage());
 
-        if(userEntity == null){
-            return returnValue;
-        }
         String token = new Utils().generatePasswordResetToken(userEntity.getUserId());
 
         PasswordResetTokenEntity passwordResetTokenEntity = new PasswordResetTokenEntity();
@@ -117,31 +116,33 @@ public class UserServiceImpl implements UserService {
         passwordResetTokenEntity.setUserDetails(userEntity);
         passwordResetTokenRepository.save(passwordResetTokenEntity);
 
-        String link = "http://localhost:8080/estore/home/password/create?token="
-                +passwordResetTokenEntity.getToken();
+        String link = SecurityConstants.PASSWORD_EMAIL_LINK+token;
 
         EmailBuilder emailBuilder = new EmailBuilder();
         emailService.send(userEntity.getEmail(),emailBuilder.buildPasswordResetContent(userEntity.getFirstName(),link));
-        returnValue = true;
-        return returnValue;
+
+        return true;
     }
 
     @Override
     public Boolean verifyPasswordResetToken(String token,String password1,String password2) {
-        Boolean returnValue =false;
+
         PasswordResetTokenEntity passwordResetTokenEntity = passwordResetTokenRepository.findByToken(token);
 
-        if (passwordResetTokenEntity == null || !password1.equals(password2)){
-            return returnValue;
-        }
+        if (passwordResetTokenEntity == null)
+            throw new ClientSideException(Messages.TOKEN_NOT_FOUND.getMessage());
 
-        UserEntity userEntity = passwordResetTokenEntity.getUserDetails();
-        System.out.println(userEntity.getEmail());
-        userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(password1));
-        userRepository.save(userEntity);
-        returnValue = true;
-        passwordResetTokenRepository.delete(passwordResetTokenEntity);
-        return returnValue;
+        if (!password1.equals(password2))
+            throw new ClientSideException(Messages.PASSWORD_NOT_MATCHING.getMessage());
+
+        if(Utils.hasTokenExpired(token)) throw new ClientSideException((Messages.TOKEN_EXPIRED.getMessage()));
+
+            UserEntity userEntity = passwordResetTokenEntity.getUserDetails();
+            userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(password1));
+            userRepository.save(userEntity);
+            passwordResetTokenRepository.delete(passwordResetTokenEntity);
+
+        return true;
     }
 
     @Override
@@ -159,7 +160,8 @@ public class UserServiceImpl implements UserService {
     }
 
     public UserDto createSeller(UserDto user) {
-        if(userRepository.findByEmail(user.getEmail()) != null) throw new RuntimeException("Record Already Exixts");
+        if(userRepository.findByEmail(user.getEmail()) != null)
+            throw new ClientSideException(Messages.RECORD_ALREADY_EXISTS.getMessage());
         for (int i=0;i<user.getAddress().size();i++) {
             AddressDto addressDto = user.getAddress().get(i);
             addressDto.setUserDetails(user);
@@ -191,8 +193,6 @@ public class UserServiceImpl implements UserService {
     public UserDto updateUser(String userId, UserDto user) {
         UserEntity userEntity = userRepository.findByUserId(userId);
 
-        if (userEntity == null) throw new UsernameNotFoundException(userId);
-
         if (user.getFirstName() != null){
             userEntity.setFirstName(user.getFirstName());
         }
@@ -213,7 +213,6 @@ public class UserServiceImpl implements UserService {
         AddressEntity addressEntity = addressRepository.findByAddressId(addressid);
 
         if(address.getCity() != null){
-            System.out.println(address.getCity());
             addressEntity.setCity(address.getCity());
         }
         if(address.getCountry() != null){

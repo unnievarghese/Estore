@@ -24,7 +24,7 @@ public class UserEntity implements Serializable {
     @Column(nullable = false,length = 50)
     private String lastName;
     @Column(nullable = false,length = 15)
-    private Long phoneNumber;
+    private String phoneNumber;
     @Column(nullable = false,length = 120,unique = true)
     private String email;
     @Column(nullable = false)
@@ -77,11 +77,11 @@ public class UserEntity implements Serializable {
         this.lastName = lastName;
     }
 
-    public Long getPhoneNumber() {
+    public String  getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(Long phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
