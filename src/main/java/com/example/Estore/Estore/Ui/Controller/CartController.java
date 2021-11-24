@@ -6,9 +6,9 @@ import com.example.Estore.Estore.Ui.Model.Response.CartRequest.CartItemRest;
 import com.example.Estore.Estore.Ui.Model.Response.OperationStatusModel;
 import com.example.Estore.Estore.Ui.Model.Response.RequestOperationName;
 import com.example.Estore.Estore.Ui.Model.Response.RequestOperationStatus;
-import com.example.Estore.Estore.Ui.Model.Response.WishListRequest.WishListRest;
 import com.example.Estore.Estore.io.Entity.Cart.CartItemEntity;
-import com.example.Estore.Estore.io.Entity.User.UserEntity;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -26,6 +26,12 @@ public class CartController {
 
 //  http://localhost:8080/Estore/cart/addProduct/{productId}?quantity={?}
 
+@ApiImplicitParams({
+        @ApiImplicitParam(name = "authorization",
+                value = "${userController.authorizationHeader.description}",
+                paramType = "header")
+})
+
     @PostMapping(path = "/addProduct/{productId}")
     public CartItemRest addCartItem(@PathVariable(value = "productId") Long productId,
                                     @RequestParam(value = "quantity") Integer quantity) throws Exception {
@@ -40,6 +46,12 @@ public class CartController {
     }
 //  http://localhost:8080/Estore/cart/fetch
 
+@ApiImplicitParams({
+        @ApiImplicitParam(name = "authorization",
+                value = "${userController.authorizationHeader.description}",
+                paramType = "header")
+})
+
     @GetMapping(path = "/fetch")
     public List<CartItemEntity> getCartById() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -49,6 +61,12 @@ public class CartController {
 
     }
 //  http://localhost:8080/Estore/cart/deleteProduct/{productId}
+
+@ApiImplicitParams({
+        @ApiImplicitParam(name = "authorization",
+                value = "${userController.authorizationHeader.description}",
+                paramType = "header")
+})
 
     @DeleteMapping(path = "/deleteProduct/{productId}")
     public OperationStatusModel removeProduct(@PathVariable(value = "productId") Long productId) throws Exception {
@@ -68,6 +86,12 @@ public class CartController {
     }
 //  http://localhost:8080/Estore/cart/product/addQuantity/{productId}?quantity={count}
 
+@ApiImplicitParams({
+        @ApiImplicitParam(name = "authorization",
+                value = "${userController.authorizationHeader.description}",
+                paramType = "header")
+})
+
     @PutMapping("product/addQuantity/{productId}")
     public String addQuantity(@PathVariable(value = "productId") Long productId,
                                                          @RequestParam(value = "quantity",defaultValue = "0") Integer quantity)throws Exception{
@@ -80,6 +104,12 @@ public class CartController {
     }
 
 //   http://localhost:8080/Estore/cart/product/reduceQuantity/{productId}?quantity={count}
+
+@ApiImplicitParams({
+        @ApiImplicitParam(name = "authorization",
+                value = "${userController.authorizationHeader.description}",
+                paramType = "header")
+})
 
     @PutMapping("product/reduceQuantity/{productId}")
     public String reduceQuantity(@PathVariable(value = "productId") Long productId,
@@ -95,6 +125,12 @@ public class CartController {
 
 //    http://localhost:8080/Estore/cart/addWishlist/{wishlistid}?quantity={count}
 
+@ApiImplicitParams({
+        @ApiImplicitParam(name = "authorization",
+                value = "${userController.authorizationHeader.description}",
+                paramType = "header")
+})
+
     @PostMapping(path = "/addWishlist/{wishlistid}")
     public String addWishlistToCart(@PathVariable(value = "wishlistid")long wishlistid,
                                           @RequestParam(value = "quantity",defaultValue = "0") Integer quantity){
@@ -106,7 +142,6 @@ public class CartController {
         return wishListRest;
 
     }
-
 }
 
 

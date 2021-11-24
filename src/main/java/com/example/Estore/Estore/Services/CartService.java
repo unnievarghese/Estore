@@ -66,13 +66,13 @@ public class CartService {
 
         if (cartItemEntity==null){
 
-            return "Cart is not active";
+            return "not active";
         }
         cartItemEntity.setQuantity(cartItemEntity.getQuantity()+quantity);
         cartItemEntity.setTotalPrice(cartItemEntity.getTotalPrice()+(productEntity.getPrice()*quantity));
         cartItemRepository.save(cartItemEntity);
 
-        return "Cart updated";
+        return "cart updated";
 
 }
 
