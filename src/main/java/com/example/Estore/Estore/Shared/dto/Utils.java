@@ -1,9 +1,7 @@
 package com.example.Estore.Estore.Shared.dto;
 
 import com.example.Estore.Estore.Security.SecurityConstants;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.springframework.stereotype.Component;
 import java.security.SecureRandom;
 import java.util.Date;
@@ -37,12 +35,18 @@ public class Utils {
     }
 
     public static boolean hasTokenExpired(String token){
-        Claims claims = Jwts.parser()
-                .setSigningKey(SecurityConstants.getTokenSecret())
-                .parseClaimsJws(token).getBody();
-        Date tokenExpirationTime = claims.getExpiration();
-        Date currentTime = new Date();
-        return tokenExpirationTime.before(currentTime);
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(SecurityConstants.getTokenSecret())
+                    .parseClaimsJws(token).getBody();
+            Date tokenExpirationTime = claims.getExpiration();
+            Date currentTime = new Date();
+            System.out.println(tokenExpirationTime.before(currentTime));
+            return tokenExpirationTime.before(currentTime);
+        }
+        catch (ExpiredJwtException ex) {
+            return true;
+        }
     }
 
     public String generatePasswordResetToken(String userId){
