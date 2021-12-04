@@ -11,15 +11,27 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+/**
+ * This class implements emailService interface and provides the logic for email sending.
+ */
 @Service
 public class EmailServiceimpl implements EmailService {
     private final JavaMailSender mailSender;
     private final static Logger LOGGER = LoggerFactory.getLogger(EmailServiceimpl.class);
 
+    /**
+     * Constructor.
+     * @param mailSender JavaMailSender.
+     */
     public EmailServiceimpl(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
 
+    /**
+     * Method is used to send email.
+     * @param to Email id provided by the user.
+     * @param email The body of the email.
+     */
     @Override
     @Async
     public void send(String to, String email) {
@@ -28,7 +40,7 @@ public class EmailServiceimpl implements EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage,"utf-8");
             helper.setText(email,true);
             helper.setTo(to);
-            helper.setSubject("Confirm email");
+            helper.setSubject("Estore Message");
             helper.setFrom("mctraining1993@gmail.com");
             mailSender.send(mimeMessage);
         }
