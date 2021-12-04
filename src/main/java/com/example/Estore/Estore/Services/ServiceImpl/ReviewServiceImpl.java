@@ -1,7 +1,9 @@
 package com.example.Estore.Estore.Services.ServiceImpl;
 
+import com.example.Estore.Estore.Exception.ClientSideException;
 import com.example.Estore.Estore.Shared.dto.User.UserDto;
 import com.example.Estore.Estore.Ui.Model.Request.ReviewRequest.ReviewRequestModel;
+import com.example.Estore.Estore.Ui.Model.Response.Messages;
 import com.example.Estore.Estore.Ui.Model.Response.ReviewRequest.ReviewRest;
 import com.example.Estore.Estore.io.Entity.Product.ProductEntity;
 import com.example.Estore.Estore.io.Entity.Review.ReviewEntity;
@@ -29,38 +31,19 @@ public class ReviewServiceImpl {
     @Autowired
     ReviewRepository reviewRepository;
 
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public class BadRequestException extends Exception {
 
-        public BadRequestException(String message) {
-            super(message);
-        }
-    }
-    @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public class NotFoundException extends Exception {
-
-        public NotFoundException(String message) {
-            super(message);
-        }
-    }
-
+    //Create review on any product which is there in the database
     public ReviewRest createReviewByUserId(ReviewRequestModel reviewRequestModel, UserDto user) throws Exception {
         UserEntity userEntity = new UserEntity();
         BeanUtils.copyProperties(user, userEntity);
         ReviewEntity reviewEntity = new  ReviewEntity();
         BeanUtils.copyProperties(reviewRequestModel, reviewEntity);
         Optional<ReviewEntity>optionalReviewEntity=reviewRepository.findByProductIdAndUserId(reviewRequestModel.getProductId(),user.getId());
-        //Optional<ProductEntity> optionalProductEntity=productRepository.findById(reviewRequestModel.getProductId());
-
-
         ProductEntity productEntity = productRepository.findById(reviewRequestModel.getProductId()).get();
-//        if (optionalProductEntity.isEmpty())
-//        {
-//            throw new NotFoundException("Product does not exist");
-//        }
+
          if (reviewRequestModel.getRating()>5)
         {
-            throw new BadRequestException("Invalid Rating");
+            throw new ClientSideException(Messages.INVALID_INPUT.getMessage());
         }
         else if (optionalReviewEntity.isEmpty()){
 
@@ -80,7 +63,7 @@ public class ReviewServiceImpl {
             return reviewRest;
         }
         else {
-            throw new BadRequestException("review already exists");
+            throw new ClientSideException(Messages.RECORD_ALREADY_EXISTS.getMessage());
         }
     }
 
@@ -93,41 +76,51 @@ public class ReviewServiceImpl {
 //    }
 
 
-
+    //update a review
     public ReviewRest updateReview(ReviewRequestModel reviewRequestModel, UserDto user) {
         UserEntity userEntity = new UserEntity();
         BeanUtils.copyProperties(user, userEntity);
 
         Optional<ReviewEntity> reviewEntity=reviewRepository.findByProductIdAndUserId(reviewRequestModel.getProductId(), userEntity.getId());
+        if (reviewRequestModel.getRating()>5)
+        {
+            throw new ClientSideException(Messages.INVALID_INPUT.getMessage());
+        }
+        else {
+            reviewEntity.get().setRating(reviewRequestModel.getRating());
+            reviewEntity.get().setReview(reviewRequestModel.getReview());
+            ReviewEntity updateReview = reviewRepository.save(reviewEntity.get());
+            ReviewRest reviewRest = new ReviewRest();
+            reviewRest.setUserName(reviewEntity.get().getUserEntity().getFirstName());
+            BeanUtils.copyProperties(updateReview, reviewRest);
 
-        reviewEntity.get().setRating(reviewRequestModel.getRating());
-        reviewEntity.get().setReview(reviewRequestModel.getReview());
-        ReviewEntity updateReview=reviewRepository.save(reviewEntity.get());
-        ReviewRest reviewRest=new ReviewRest();
-        reviewRest.setUserName(reviewEntity.get().getUserEntity().getFirstName());
-        BeanUtils.copyProperties(updateReview,reviewRest);
-
-        return reviewRest;
+            return reviewRest;
+        }
 
     }
 
-
+    //Delete a review using userId and productId
     public ReviewEntity deleteReviewByUser(UserDto user, Long productId) {
         Optional<ReviewEntity> reviewEntity=reviewRepository.findAllByUserIdAndProductId(user.getId(),productId);
+        if (reviewEntity.isEmpty())
+        {
+            throw new ClientSideException(Messages.NO_RECORD_FOUND.getMessage());
+        }
         ReviewEntity reviewEntity1=reviewEntity.get();
+
         Long reviewId=reviewEntity1.getReviewId();
         reviewRepository.deleteReview(reviewId,productId);
 
         return null;
     }
-
+   //get all reviews based on productId
     public List<ReviewRest> findReviewByProductId(Long productId,UserDto user) throws Exception {
         UserEntity userEntity = new UserEntity();
         BeanUtils.copyProperties(user, userEntity);
      List<ReviewEntity> reviewEntityList=reviewRepository.findByProductId(productId);
      if (reviewEntityList.isEmpty())
      {
-         throw new NotFoundException("There is no review");
+         throw new ClientSideException(Messages.NO_RECORD_FOUND.getMessage());
      }
      else{
          List<ReviewRest> reviewRests=new ArrayList<>();
@@ -141,12 +134,12 @@ public class ReviewServiceImpl {
          return reviewRests;
      }
     }
-
-    public List<ReviewRest> findReviewByUserId(UserDto user, Long id) throws Exception {
+    //get all reviews done by the user
+    public List<ReviewRest> findReviewByUserId(UserDto user) throws Exception {
         List<ReviewEntity>reviewEntityList=reviewRepository.findReviewByUser(user.getId());
         if ((reviewEntityList.isEmpty()))
         {
-            throw new NotFoundException("no reviews by the user");
+            throw new ClientSideException(Messages.EMPTY_RECORD.getMessage());
         }
         else {
             List<ReviewRest>reviewRests=new ArrayList<>();

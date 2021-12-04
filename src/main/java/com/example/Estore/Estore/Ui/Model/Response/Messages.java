@@ -16,7 +16,12 @@ public enum Messages {
     EMAIL_ADDRESS_VERIFIED("Email Authentication Successfull"),
     PASSWORD_NOT_MATCHING("Entered passwords are different!"),
     PASSWORD_NOT_CHANGED("Password could not be changed."),
-    PASSWORD_CHANGED("Password Successfully changed.");
+    PASSWORD_CHANGED("Password Successfully changed."),
+    INVALID_INPUT("the given input is invalid."),
+    PRODUCT_ID_NOT_FOUND("productId not provided"),
+    PRODUCT_DOES_NOT_EXIST("Product with given id does not exist,Please verify the id again"),
+    EMPTY_RECORD("the record is empty");
+
 
     private String Message;
 

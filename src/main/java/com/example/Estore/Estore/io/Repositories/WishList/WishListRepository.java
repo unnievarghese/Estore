@@ -22,4 +22,7 @@ public interface WishListRepository extends CrudRepository<WishListEntity,Long> 
     @Modifying
     @Query(value = "DELETE FROM wishlist_product_entity_list w WHERE w.wish_list_entity_wish_list_id=?1 AND w.product_entity_list_product_id=?2",nativeQuery = true)
     void deleteProduct(Long wishListId, Long productId);
+
+    @Query(value="SELECT *  FROM wishlist_product_entity_list w WHERE w.wish_list_entity_wish_list_id=?1 AND w.product_entity_list_product_id=?2",nativeQuery = true)
+    Optional<WishListEntity> findByProductIdAndWWishlistId(Long wishListId, Long productId);
 }
