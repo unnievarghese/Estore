@@ -12,15 +12,32 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 
+/**
+ * A Class that checks if the particular request has necessary authorizations.
+ */
 public class AuthorizationFilter extends BasicAuthenticationFilter {
 
     private final UserRepository userRepository;
+
+    /**
+     * Class constructor.
+     * @param authManager AuthenticationManager.
+     * @param userRepository UserRepository.
+     */
     public AuthorizationFilter(AuthenticationManager authManager, UserRepository userRepository) {
         super(authManager);
         this.userRepository = userRepository;
     }
+
+    /**
+     * Method acts as a filter, gets the authentication of a user from jwt token and sets the security context holder with the authentication.
+     * @param req Http request.
+     * @param res Http request.
+     * @param chain FilterChain.
+     * @throws IOException Throws input/output exceptions.
+     * @throws ServletException Throws Servlet exceptions.
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest req,
                                     HttpServletResponse res,
@@ -34,6 +51,12 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         chain.doFilter(req,res);
     }
+
+    /**
+     * Method is used to get the authentication of a user using its jwt token.
+     * @param request Http request.
+     * @return UsernamePasswordAuthenticationToken.
+     */
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
         String token = request.getHeader(SecurityConstants.HEADER_STRING);
 

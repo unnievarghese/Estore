@@ -2,6 +2,9 @@ package com.example.Estore.Estore.Security;
 
 import com.example.Estore.Estore.SpringApplicationContext;
 
+/**
+ * Class stores all the constant values that will be called inside security related classes.
+ */
 public class SecurityConstants {
 
     public static final String SIGN_UP_URL = "/home/user/create";
@@ -14,6 +17,8 @@ public class SecurityConstants {
     public static final String PASSWORD_RESET_URL = "/home/password/create";
     public static final String USER_CREATE_EMAIL_LINK = "http://localhost:8080/estore/home/email/verify?token=";
     public static final String PASSWORD_EMAIL_LINK = "http://localhost:8080/estore/home/password/create?token=";
+    public static final String RESEND_EMAIL_LINK = "/home/resend/verification";
+    public static final String USER_ACTIVATION_REQUEST_URL = "/home/user/activate/{userId}";
 
 
     public static String getTokenSecret(){

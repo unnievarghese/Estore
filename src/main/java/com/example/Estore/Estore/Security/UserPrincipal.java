@@ -5,22 +5,28 @@ import com.example.Estore.Estore.io.Entity.User.RoleEntity;
 import com.example.Estore.Estore.io.Entity.User.UserEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 
+/**
+ * This class is used to return the user's roles and authorities.
+ */
 public class UserPrincipal  {
-
-//    private static final long serialVersionUID = 8021285396365229175L;
 
     UserEntity userEntity;
 
+    /**
+     * Class constructor.
+     * @param userEntity UserEntity.
+     */
     public UserPrincipal(UserEntity userEntity) {
         this.userEntity = userEntity;
     }
 
+    /**
+     * Method used to get all the roles and authorities the user has.
+     * @return Collection<? extends GrantedAuthority>
+     */
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
         Collection<GrantedAuthority> authorities = new HashSet<>();
@@ -41,34 +47,4 @@ public class UserPrincipal  {
 
         return authorities;
     }
-
-//    @Override
-//    public String getPassword() {
-//        return this.userEntity.getEncryptedPassword();
-//    }
-//
-//    @Override
-//    public String getUsername() {
-//        return this.userEntity.getEmail();
-//    }
-//
-//    @Override
-//    public boolean isAccountNonExpired() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isAccountNonLocked() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isCredentialsNonExpired() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean isEnabled() {
-//        return this.userEntity.getEmailVerificationStatus();
-//    }
 }
