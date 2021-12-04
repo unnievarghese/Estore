@@ -8,26 +8,81 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * This interface is used to access the database.
+ */
 @Repository
 @Transactional
 public interface UserRepository extends PagingAndSortingRepository<UserEntity,Long> {
+
+    /**
+     * Method is used to fetch a user by its email.
+     * @param email email.
+     * @return UserEntity.
+     */
     UserEntity findByEmail(String email);
+
+    /**
+     * Method is used to fetch a user by its userId.
+     * @param userId unique userId generated foe each user.
+     * @return UserEntity.
+     */
     UserEntity findByUserId(String userId);
+
+    /**
+     * Method is used to fetch a user by its userId.
+     * @param token jwt token generated for email verification.
+     * @return UserEntity.
+     */
     UserEntity findByEmailVerificationToken(String token);
 
+    /**
+     * Method is used to delete address by its foreign key from user.
+     * @param id UserEntity
+     */
     @Modifying
     @Query(value = "DELETE FROM addresses WHERE user_id = :id",nativeQuery = true)
-    void deleteAddress(@Param("id") Long id);
+    void deleteAddress(@Param("id") UserEntity id);
 
+    /**
+     * Method is used to delete card by its foreign key from user.
+     * @param id UserEntity
+     */
     @Modifying
     @Query(value = "DELETE FROM card_details WHERE user_id = :id",nativeQuery = true)
-    void deleteCard(@Param("id") Long id);
+    void deleteCard(@Param("id") UserEntity id);
 
+    /**
+     * Method is used to delete role by its foreign key from user.
+     * @param id UserEntity
+     */
     @Modifying
     @Query(value = "DELETE FROM user_roles WHERE user_id = :id",nativeQuery = true)
-    void deleteRole(@Param("id") Long id);
+    void deleteRole(@Param("id") UserEntity id);
 
+    /**
+     * Method is used to delete user by database id.
+     * @param id UserEntity
+     */
     @Modifying
     @Query(value = "DELETE FROM users WHERE id = :id",nativeQuery = true)
-    int deleteUser(@Param("id") Long id);
+    int deleteUser(@Param("id") UserEntity id);
+
+    /**
+     * Method used to update the email verification token to true.
+     * @param userId unique userId generated foe each user.
+     * @return integer.
+     */
+    @Modifying
+    @Query(value = "UPDATE users set email_verification_status = false WHERE user_id = :id",nativeQuery = true)
+    int deactivateUser(@Param("id") String userId);
+
+    /**
+     * Method used to update the email verification token to true.
+     * @param userId unique userId generated foe each user.
+     * @return integer.
+     */
+    @Modifying
+    @Query(value = "UPDATE users set email_verification_status = true WHERE user_id = :id",nativeQuery = true)
+    int activateUser(@Param("id") String userId);
 }

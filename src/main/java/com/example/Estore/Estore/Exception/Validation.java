@@ -2,8 +2,16 @@ package com.example.Estore.Estore.Exception;
 
 import com.example.Estore.Estore.Ui.Model.Request.UserRequest.UserDetailsRequestModel;
 
+/**
+ * Class is used to validate incoming json.
+ */
 public class Validation {
 
+    /**
+     * Method is used to check if the fields are empty.
+     * @param userDetails UserDetailsRequestModel
+     * @return Boolean
+     */
     public Boolean checkFields(UserDetailsRequestModel userDetails){
 
         if(userDetails.getFirstName().isEmpty()) return false;
