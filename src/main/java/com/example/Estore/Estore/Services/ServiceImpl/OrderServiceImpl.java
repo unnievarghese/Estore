@@ -1,9 +1,12 @@
 package com.example.Estore.Estore.Services.ServiceImpl;
-import com.example.Estore.Estore.Shared.dto.Order.OrderDto;
-import com.example.Estore.Estore.Shared.dto.User.UserDto;
+import com.example.Estore.Estore.Exception.ClientSideException;
+import com.example.Estore.Estore.Services.EmailService;
+import com.example.Estore.Estore.Ui.Model.Response.Messages;
 import com.example.Estore.Estore.Ui.Model.Response.OrderResponse.OrderResponseModel;
 import com.example.Estore.Estore.io.Entity.Cart.CartItemEntity;
 import com.example.Estore.Estore.io.Entity.Order.OrderEntity;
+import com.example.Estore.Estore.io.Entity.Product.ProductEntity;
+import com.example.Estore.Estore.io.Entity.User.AddressEntity;
 import com.example.Estore.Estore.io.Entity.User.UserEntity;
 import com.example.Estore.Estore.io.Repositories.Cart.CartItemRepository;
 import com.example.Estore.Estore.io.Repositories.Order.OrderRepository;
@@ -17,9 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
     public class OrderServiceImpl {
@@ -42,7 +43,16 @@ import java.util.Optional;
         @Autowired
         UserRepository userRepository;
 
+        @Autowired
+    EmailService emailService;
 
+
+    /**
+     * createOrder class implements the creation of order for all the products in the cart having open status
+     * @param userId - for finding cart details and user details
+     * @return orderEntity
+     * @throws Exception - EMPTY_CART - no products in cart
+     */
         public OrderEntity createOrder(String userId) throws Exception {
 
             //finding user with userid
@@ -53,7 +63,9 @@ import java.util.Optional;
 
 
             //setting the user address to order
-            orderEntity.setShippingAddress(userEntity.getAddress().get(0));
+            orderEntity.setShippingAddress(userEntity.getAddress().get(1));
+            orderEntity.setBillingAddress(userEntity.getAddress().get(0));
+
 
 
 
@@ -62,13 +74,9 @@ import java.util.Optional;
 
 
             //finding total amount and setting
-            List<CartItemEntity> cartItemEntity = cartItemRepository.findByUserEntity(userEntity);
-
-
-            //orderEntity.setCartitemEntity(cartItemEntity);
-
-
-            //orderEntity.setCartitemEntity(cartItemEntity);
+            List<CartItemEntity> cartItemEntity = cartItemRepository.findByCartStatus(userEntity);
+            if(cartItemEntity.isEmpty())
+                throw new ClientSideException(Messages.EMPTY_CART.getMessage());
 
 
             double totalamount=0;
@@ -90,21 +98,48 @@ import java.util.Optional;
 
 
             }
+            //setting total amount
             orderEntity.setOrderAmount(totalamount);
 
             //setting ordered date
             orderEntity.setOrderedTime(LocalDateTime.now());
 
+            //setting user entity
             orderEntity.setUserEntity(userEntity);
 
 
 
-            //cartEntity.setCartStatus("closed");
             orderRepository.save(orderEntity);
+
+            Orderemailbuilder orderemailbuilder =new Orderemailbuilder();
+            Long id=orderEntity.getOrderId();
+            String status=orderEntity.getOrderStatus();
+            double orderamount=orderEntity.getOrderAmount();
+            //AddressEntity address=orderEntity.getShippingAddress();
+            String address=orderEntity.getShippingAddress().getStreetName()+","+
+                    orderEntity.getShippingAddress().getCity()+","+
+                    orderEntity.getShippingAddress().getCountry()+","+
+                    orderEntity.getShippingAddress().getPostalCode()+"<br>";
+
+            String item="";
+            for(CartItemEntity cartItem:orderEntity.getCartitemEntityList()){
+                item+="Product name : "+cartItem.getProductName()+"  Quantity : "+cartItem.getQuantity()+" Total Price : "+cartItem.getTotalPrice()+"<br>";
+            }
+            emailService.send(userEntity.getEmail(),orderemailbuilder.buildorderplacedcontent(userEntity.getFirstName(),id,status,orderamount,address,item));
+
+
             return orderEntity;
 
         }
 
+
+    /**
+     * createOrderByProductId implements creation of order from the open cart with only the product given by the user
+     * @param productId - for creating order
+     * @param userId - for finding cart details and user details
+     * @return orderEntity
+     * @throws Exception - INVALID_PRODUCTID - No products with productId
+     */
     public OrderEntity createOrderByProductId(Long productId,String userId) throws Exception {
 
         //finding user with userid
@@ -116,7 +151,8 @@ import java.util.Optional;
         OrderEntity orderEntity = new OrderEntity();
 
         //setting the user address to order
-        orderEntity.setShippingAddress(userEntity.getAddress().get(0));
+        orderEntity.setShippingAddress(userEntity.getAddress().get(1));
+        orderEntity.setBillingAddress(userEntity.getAddress().get(0));
 
 
 
@@ -125,66 +161,78 @@ import java.util.Optional;
 
         //finding total amount and setting
         CartItemEntity cartItemEntity = cartItemRepository.findByUserEntityANDProductId(userEntity,productId);
+
+        if (cartItemEntity==null)
+
+            throw new ClientSideException(Messages.INVALID_PRODUCTID.getMessage());
         double totalamount=0;
 
-        //for(CartItemEntity item :cartItemEntity){
 
             //checking cart status
         //if(cartItemEntity.isCartIsActive())
+
+        //getting total amount
          totalamount=cartItemEntity.getTotalPrice();
 
         orderEntity.getCartitemEntityList().add(cartItemEntity);
 
         cartItemEntity.setCartIsActive(false);//making cart status false
 
-
+        //setting total amount
         orderEntity.setOrderAmount(totalamount);
+
+        //setting order date
         orderEntity.setOrderedTime(LocalDateTime.now());
+
+        //setting user entity
         orderEntity.setUserEntity(userEntity);
 
 
 
-
-
-        //cartEntity.setCartStatus("closed");
         orderRepository.save(orderEntity);
+
+        Orderemailbuilder orderemailbuilder =new Orderemailbuilder();
+        Long id=orderEntity.getOrderId();
+        String status=orderEntity.getOrderStatus();
+        double orderamount=orderEntity.getOrderAmount();
+        //AddressEntity address=orderEntity.getShippingAddress();
+        String address=orderEntity.getShippingAddress().getStreetName()+","+
+                orderEntity.getShippingAddress().getCity()+","+
+                orderEntity.getShippingAddress().getCountry()+","+
+                orderEntity.getShippingAddress().getPostalCode()+"<br>";
+
+        String item="";
+        for(CartItemEntity cartItem:orderEntity.getCartitemEntityList()){
+            item+="Product name : "+cartItem.getProductName()+"  Quantity : "+cartItem.getQuantity()+" Total Price : "+cartItem.getTotalPrice()+"<br>";
+        }
+        emailService.send(userEntity.getEmail(),orderemailbuilder.buildorderplacedcontent(userEntity.getFirstName(),id,status,orderamount,address,item));
+
+
         return orderEntity;
 
     }
 
 
+    /**
+     * findByUserId class returns all order details of the particular user
+     * @param id - for finding order details
+     * @return orders
+     * @throws Exception NO_ORDER - No order history with user
+     */
+    public List<OrderResponseModel> findByUserId(Long id) throws Exception  {
 
+        //UserEntity userEntity = userRepository.findByUserId(id);
 
-
-
-//    public List<OrderEntity> findByuserId(Long userId) {
-//        //UserEntity userEntity = new UserEntity();
-//       // BeanUtils.copyProperties(user, userEntity);
-//      List<OrderEntity> orderEntity =orderRepository.findByuserId(userId);
-//      return orderEntity;
-//
-//       // return orderRepository.findByuserId(userId);
-//    }
-
-
-    public List<OrderResponseModel> findByUserId(UserDto user, Long id) throws Exception  {
-
-        //UserEntity userEntity = userRepository.findByUserId(user.getUserId());
         List<OrderEntity>orderEntityList=orderRepository.findByuserId(id);
         if ((orderEntityList.isEmpty()))
         {
-            throw new Exception("no orders by the user");
+            throw new ClientSideException(Messages.NO_ORDER.getMessage());
         }
         else {
             List<OrderResponseModel>orders=new ArrayList<>();
             for (OrderEntity orderEntity:orderEntityList)
             {
                 OrderResponseModel order=new OrderResponseModel();
-               // orderEntity.setShippingAddress(userEntity.getAddress().get(0));
-
-               // order.setShippingAddress(orderEntity.getShippingAddress());
-                //BeanUtils.copyProperties(orderEntity,order);
-               // orders.add(order);
                 orders.add(new ModelMapper().map(orderEntity,OrderResponseModel.class));
             }
             return  orders;
@@ -192,115 +240,195 @@ import java.util.Optional;
     }
 
 
-    public List<OrderResponseModel> findByorderId(UserDto user, Long id) throws Exception  {
-
-        //UserEntity userEntity = userRepository.findByUserId(user.getUserId());
-        List<OrderEntity>orderEntityList=orderRepository.findByOrderId(id);
-        if ((orderEntityList.isEmpty()))
-        {
-            throw new Exception("no orders by the orderId");
-        }
-        else {
-            List<OrderResponseModel>orders=new ArrayList<>();
-            for (OrderEntity orderEntity:orderEntityList)
-            {
-                OrderResponseModel order=new OrderResponseModel();
-                // orderEntity.setShippingAddress(userEntity.getAddress().get(0));
-
-                // order.setShippingAddress(orderEntity.getShippingAddress());
-                //BeanUtils.copyProperties(orderEntity,order);
-                // orders.add(order);
-                orders.add(new ModelMapper().map(orderEntity,OrderResponseModel.class));
-            }
-            return  orders;
-        }
-    }
-
-
-    public List<OrderResponseModel> findByorderStatus(UserDto user, String id) throws Exception  {
-        String id1=id.toLowerCase();
-
-        System.out.println(id1);
-        //UserEntity userEntity = userRepository.findByUserId(user.getUserId());
-        List<OrderEntity>orderEntityList=orderRepository.findByOrderStatusandUserId(user.getId(),id1);
-        if ((orderEntityList.isEmpty()))
-        {
-            throw new Exception("no status by the given status");
-        }
-        else {
-            List<OrderResponseModel>orders=new ArrayList<>();
-            for (OrderEntity orderEntity:orderEntityList)
-            {
-                OrderResponseModel order=new OrderResponseModel();
-                // orderEntity.setShippingAddress(userEntity.getAddress().get(0));
-
-                // order.setShippingAddress(orderEntity.getShippingAddress());
-                //BeanUtils.copyProperties(orderEntity,order);
-                // orders.add(order);
-                orders.add(new ModelMapper().map(orderEntity,OrderResponseModel.class));
-            }
-            return  orders;
-        }
-    }
-
-
-
-
-
-    public OrderEntity updateOrderStatus(UserDto user, Long orderId, String status) throws Exception {
-
-            String status1=status.toLowerCase();
+    /**
+     * findByorderId returns all the order details of the particular user with the orderId
+     * @param userId - for finding order details
+     * @param id - for finding order details
+     * @return orders
+     * @throws Exception INVALID_ORDERID - No order wth given id
+     */
+    public OrderEntity findByorderId(Long userId, Long id) throws Exception  {
 
         //UserEntity userEntity = userRepository.findByUserId(userId);
 
+        OrderEntity orderEntity=orderRepository.findByUserIdandOrderId(userId,id);
+
+        if ((orderEntity==null))
+        {
+            throw new ClientSideException(Messages.INVALID_ORDERID.getMessage());
+        }
+        else {
+            //List<OrderResponseModel>orders=new ArrayList<>();
+            //for (OrderEntity orderEntity:orderEntityList)
+           // {
+              return orderEntity;
+            }
+
+
+        }
+
+
+
+    /**
+     * findByorderStatus class returns all the order details of the particular user with the orderStatus
+     * @param userId - for finding order details
+     * @param id - for finding order details
+     * @return orders
+     * @throws Exception INVALID_STATUS - not valid status   NO_ORDER_STATUS - No order with status given
+     */
+    public List<OrderResponseModel> findByorderStatus(Long userId, String id) throws Exception  {
+        String id1=id.toLowerCase();
+
+        //System.out.println(id1);
+        if (!id1.equals("confirmed") && !id1.equals("shipped") && !id1.equals("in-transit") && !id1.equals("delivered") && !id1.equals("cancelled"))
+            throw new ClientSideException(Messages.INVALID_STATUS.getMessage());
+
+        //UserEntity userEntity = userRepository.findByUserId(userId);
+
+        List<OrderEntity>orderEntityList=orderRepository.findByOrderStatusandUserId(userId,id1);
+        if ((orderEntityList.isEmpty()))
+        {
+            throw new ClientSideException(Messages.NO_ORDER_STATUS.getMessage());
+        }
+        else {
+            List<OrderResponseModel>orders=new ArrayList<>();
+            for (OrderEntity orderEntity:orderEntityList)
+            {
+                OrderResponseModel order=new OrderResponseModel();
+                orders.add(new ModelMapper().map(orderEntity,OrderResponseModel.class));
+            }
+            return  orders;
+        }
+    }
+
+
+    /**
+     *updateOrderStatus class implements the order status updation like shipped,in-transit,delivered by the seller only
+     * @param userId-finding user details
+     * @param orderId- finding order details
+     * @param status - change status
+     * @return orderEntity
+     * @throws Exception INVALID_STATUS - not valid status  INVALID_ORDERID - No order with given Id   SAME_STATUS - already same status USER_CANCELLED - User cancelled the order
+     */
+    public OrderEntity updateOrderStatus(String userId, Long orderId, String status) throws Exception {
+
+            String status1=status.toLowerCase();
+
+        UserEntity userEntity = orderRepository.findByorderId(orderId).getUserEntity();
 
         // if (!user.getUserId().equals("seller"))
         //    throw new IllegalStateException(orderId + "cannot update");
        // String status1 = status.toLowerCase();
-//        if (!status1.equals("shipped") && !status1.equals("in-transit") && !status1.equals("delivered"))
-//            throw new IllegalStateException("Invalid update");
 
-        //UserEntity userEntity= new UserEntity();
-        //BeanUtils.copyProperties(user,userEntity);
 
-        System.out.println(status1);
+
+
+        if (!status1.equals("shipped") && !status1.equals("in-transit") && !status1.equals("delivered"))
+            throw new ClientSideException(Messages.INVALID_STATUS.getMessage());
+
         //finding order by orderid
         OrderEntity orderEntity=orderRepository.findByorderId(orderId);
 
+        if (orderEntity==null)
+            throw new ClientSideException(Messages.INVALID_ORDERID.getMessage());
+
+        if(orderEntity.getOrderStatus().equals("cancelled"))
+            throw new ClientSideException(Messages.USER_CANCELLED.getMessage());
+
         if(orderEntity.getOrderStatus().equals(status1))
-            throw new IllegalStateException("The order is already with the same status");
+            throw new ClientSideException(Messages.SAME_STATUS.getMessage());
 
         //updating order status
         orderEntity.setOrderStatus(status1);
         orderRepository.save(orderEntity);
+
+        Orderemailbuilder orderemailbuilder =new Orderemailbuilder();
+        Long id=orderEntity.getOrderId();
+        String status2=orderEntity.getOrderStatus();
+        double orderamount=orderEntity.getOrderAmount();
+        //AddressEntity address=orderEntity.getShippingAddress();
+        String address=orderEntity.getShippingAddress().getStreetName()+","+
+                orderEntity.getShippingAddress().getCity()+","+
+                orderEntity.getShippingAddress().getCountry()+","+
+                orderEntity.getShippingAddress().getPostalCode()+"<br>";
+
+        String item="";
+        for(CartItemEntity cartItem:orderEntity.getCartitemEntityList()){
+            item+="Product name : "+cartItem.getProductName()+"  Quantity : "+cartItem.getQuantity()+" Total Price : "+cartItem.getTotalPrice()+"<br>";
+        }
+        emailService.send(userEntity.getEmail(),orderemailbuilder.buildorderplacedcontent(userEntity.getFirstName(),id,status2,orderamount,address,item));
+
+
+
         return orderEntity;
-
-
     }
 
 
+//    /**
+//     * removeOrder class implements cancelling the order created by the user by passing orderId
+//     * @param userId - for finding order details
+//     * @param orderId - for finding order details
+//     */
+
+    /**
+     * removeOrder class implements cancelling the order created by the user by passing orderId
+     * @param userId for finding order details
+     * @param orderId for finding order details
+     * @throws Exception INVALID_ORDERID - No order with given orderId  ALREADY_CANCELLED - already cancelled order  CANCEL_REJECTED - Order no longer can be cancelled
+     */
+    public OrderEntity removeOrder(String userId,Long orderId) throws Exception{
 
 
+        UserEntity userEntity = userRepository.findByUserId(userId);
 
-        public void removeOrder(UserDto user,Long orderId){
 
-            UserEntity userEntity= new UserEntity();
-            BeanUtils.copyProperties(user,userEntity);
+        //UserEntity userEntity= new UserEntity();
+            //BeanUtils.copyProperties(user,userEntity);
 
             //finding order by id
-            OrderEntity orderEntity=orderRepository.findByorderId(orderId);
-
-            if(orderEntity.getOrderStatus().equals("delivered")) //|| orderEntity.getOrderStatus().equals("in-transit") || orderEntity.getOrderStatus().equals("delivered"))
-                throw new IllegalStateException("Already delivered");
-
-            else {
-
-                orderEntity.setOrderStatus("cancelled");
-                orderRepository.save(orderEntity);
+        OrderEntity orderEntity=orderRepository.findByUserIdandOrderId(userEntity.getId(), orderId);
 
 
-                //orderRepository.deleteOrder(orderId);
+        if (orderEntity==null)
+                throw new ClientSideException(Messages.INVALID_ORDERID.getMessage());
+        if (orderEntity.getOrderStatus().equals("cancelled"))
+                throw new ClientSideException(Messages.ALREADY_CANCELLED.getMessage());
+        if (orderEntity.getOrderStatus().equals("delivered") || orderEntity.getOrderStatus().equals("in-transit"))
+                throw new ClientSideException(Messages.CANCEL_REJECTED.getMessage());
+
+
+
+        orderEntity.setOrderStatus("cancelled");
+
+        for (CartItemEntity cartItemEntity : orderEntity.getCartitemEntityList()) {
+                ProductEntity productEntity = productRepository.findByProductId(cartItemEntity.getProductEntity().getProductId());
+                productEntity.setQuantity(productEntity.getQuantity() + cartItemEntity.getQuantity());
+                productRepository.save(productEntity);
             }
+
+        orderRepository.save(orderEntity);
+
+        Orderemailbuilder orderemailbuilder =new Orderemailbuilder();
+        Long id=orderEntity.getOrderId();
+        String status=orderEntity.getOrderStatus();
+        double orderamount=orderEntity.getOrderAmount();
+        //AddressEntity address=orderEntity.getShippingAddress();
+        String address=orderEntity.getShippingAddress().getStreetName()+","+
+                orderEntity.getShippingAddress().getCity()+","+
+                orderEntity.getShippingAddress().getCountry()+","+
+                orderEntity.getShippingAddress().getPostalCode()+"<br>";
+
+        String item="";
+        for(CartItemEntity cartItem:orderEntity.getCartitemEntityList()){
+            item+="Product name : "+cartItem.getProductName()+"  Quantity : "+cartItem.getQuantity()+" Total Price : "+cartItem.getTotalPrice()+"<br>";
+        }
+        emailService.send(userEntity.getEmail(),orderemailbuilder.buildorderplacedcontent(userEntity.getFirstName(),id,status,orderamount,address,item));
+
+
+
+        return orderEntity;
+
+
 
 
         }

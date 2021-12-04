@@ -26,16 +26,24 @@ public class OrderResponseModel {
     //private CartItemRest cartItemRest;
     private LocalDateTime orderedTime;
     private LocalDateTime updatedTime;
-    private List<CartItemEntity> cartitemEntityList;
+    private List<CartItemRest> cartitemEntityList;
 
-    public List<CartItemEntity> getCartitemEntityList() {
+//    public List<CartItemEntity> getCartitemEntityList() {
+//        return cartitemEntityList;
+//    }
+//
+//    public void setCartitemEntityList(List<CartItemEntity> cartitemEntityList) {
+//        this.cartitemEntityList = cartitemEntityList;
+//    }
+
+
+    public List<CartItemRest> getCartitemEntityList() {
         return cartitemEntityList;
     }
 
-    public void setCartitemEntityList(List<CartItemEntity> cartitemEntityList) {
+    public void setCartitemEntityList(List<CartItemRest> cartitemEntityList) {
         this.cartitemEntityList = cartitemEntityList;
     }
-
 
     public LocalDateTime getOrderedTime() {
         return orderedTime;

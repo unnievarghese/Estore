@@ -18,6 +18,8 @@ public enum Messages {
     PASSWORD_NOT_CHANGED("Password could not be changed."),
     PASSWORD_CHANGED("Password Successfully changed.");
 
+
+
     private String Message;
 
     Messages(String Message) {
