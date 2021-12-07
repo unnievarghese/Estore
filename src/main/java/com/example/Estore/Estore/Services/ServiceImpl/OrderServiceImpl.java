@@ -1,6 +1,8 @@
 package com.example.Estore.Estore.Services.ServiceImpl;
+import antlr.StringUtils;
 import com.example.Estore.Estore.Exception.ClientSideException;
 import com.example.Estore.Estore.Services.EmailService;
+import com.example.Estore.Estore.Shared.dto.User.AddressDto;
 import com.example.Estore.Estore.Ui.Model.Response.Messages;
 import com.example.Estore.Estore.Ui.Model.Response.OrderResponse.OrderResponseModel;
 import com.example.Estore.Estore.io.Entity.Cart.CartItemEntity;
@@ -25,25 +27,34 @@ import java.util.List;
 @Service
     public class OrderServiceImpl {
 
-        @Autowired
+    /**
+     * inject CartItemRepository dependency
+     */
+    @Autowired
     CartItemRepository cartItemRepository;
 
-        @Autowired
-        ProductRepository productRepository;
+    /**
+     * inject ProductRepository dependency
+     */
+    @Autowired
+    ProductRepository productRepository;
 
-        @Autowired
-        OrderRepository orderRepository;
+    /**
+     * inject OrderRepository dependency
+     */
+    @Autowired
+    OrderRepository orderRepository;
 
-        @Autowired
-        AddressRepository addressRepository;
+    /**
+     * inject UserRepository dependency
+     */
+    @Autowired
+    UserRepository userRepository;
 
-//        @Autowired
-//        CartRepository cartRepository;
-
-        @Autowired
-        UserRepository userRepository;
-
-        @Autowired
+    /**
+     * inject EmailService dependency
+     */
+    @Autowired
     EmailService emailService;
 
 
@@ -61,10 +72,24 @@ import java.util.List;
 
             OrderEntity orderEntity = new OrderEntity();
 
-
-            //setting the user address to order
-            orderEntity.setShippingAddress(userEntity.getAddress().get(1));
+           //setting the user address to order
+            List<AddressEntity> addressEntities=userEntity.getAddress();
+            if(addressEntities.isEmpty())
+                throw new ClientSideException(Messages.NO_ADDRESS.getMessage());
             orderEntity.setBillingAddress(userEntity.getAddress().get(0));
+            orderEntity.setShippingAddress(userEntity.getAddress().get(1));
+
+// if(addressEntity.equals(null))
+//                    throw new ClientSideException(Messages.NO_ADDRESS.getMessage());
+//            orderEntity.setShippingAddress(userEntity.getAddress().get(1));
+//            System.out.println("hello");
+//            if(userEntity.getAddress().get(0).equals(false))
+//                throw new ClientSideException(Messages.NO_BILLING.getMessage());
+//            orderEntity.setBillingAddress(userEntity.getAddress().get(0));
+
+           // orderEntity.setShippingAddress(userEntity.getAddress().get(1));
+
+            //orderEntity.setBillingAddress(userEntity.getAddress().get(0));
 
 
 
@@ -141,23 +166,49 @@ import java.util.List;
      * @throws Exception - INVALID_PRODUCTID - No products with productId
      */
     public OrderEntity createOrderByProductId(Long productId,String userId) throws Exception {
-
         //finding user with userid
        UserEntity userEntity = userRepository.findByUserId(userId);
 
 
 
 
+
         OrderEntity orderEntity = new OrderEntity();
 
-        //setting the user address to order
-        orderEntity.setShippingAddress(userEntity.getAddress().get(1));
+
+        List<AddressEntity> addressEntities=userEntity.getAddress();
+        if(addressEntities.isEmpty())
+            throw new ClientSideException(Messages.NO_ADDRESS.getMessage());
         orderEntity.setBillingAddress(userEntity.getAddress().get(0));
+        orderEntity.setShippingAddress(userEntity.getAddress().get(1));
+
+
+
+
+
+
+
+
+//        AddressEntity addressEntity=userEntity.getAddress().get(1);
+//        if(addressEntity==null)
+//            throw new ClientSideException(Messages.NO_SHIPPING.getMessage());
+//        else{
+//        //orderEntity.setShippingAddress(userEntity.getAddress().get(1));
+//            }
+//        System.out.println("hello4");
+//
+//        AddressEntity addressEntity1=userEntity.getAddress().get(0);
+//        if(addressEntity1==null)
+//            throw new ClientSideException(Messages.NO_BILLING.getMessage());
+//        else{
+//       // orderEntity.setBillingAddress(userEntity.getAddress().get(0));
+//            }
 
 
 
         //setting status as confirmed
         orderEntity.setOrderStatus("confirmed");
+
 
         //finding total amount and setting
         CartItemEntity cartItemEntity = cartItemRepository.findByUserEntityANDProductId(userEntity,productId);
@@ -165,6 +216,7 @@ import java.util.List;
         if (cartItemEntity==null)
 
             throw new ClientSideException(Messages.INVALID_PRODUCTID.getMessage());
+
         double totalamount=0;
 
 
@@ -232,7 +284,7 @@ import java.util.List;
             List<OrderResponseModel>orders=new ArrayList<>();
             for (OrderEntity orderEntity:orderEntityList)
             {
-                OrderResponseModel order=new OrderResponseModel();
+                //OrderResponseModel order=new OrderResponseModel();
                 orders.add(new ModelMapper().map(orderEntity,OrderResponseModel.class));
             }
             return  orders;
@@ -294,7 +346,7 @@ import java.util.List;
             List<OrderResponseModel>orders=new ArrayList<>();
             for (OrderEntity orderEntity:orderEntityList)
             {
-                OrderResponseModel order=new OrderResponseModel();
+                //OrderResponseModel order=new OrderResponseModel();
                 orders.add(new ModelMapper().map(orderEntity,OrderResponseModel.class));
             }
             return  orders;
@@ -314,7 +366,6 @@ import java.util.List;
 
             String status1=status.toLowerCase();
 
-        UserEntity userEntity = orderRepository.findByorderId(orderId).getUserEntity();
 
         // if (!user.getUserId().equals("seller"))
         //    throw new IllegalStateException(orderId + "cannot update");
@@ -356,6 +407,7 @@ import java.util.List;
         for(CartItemEntity cartItem:orderEntity.getCartitemEntityList()){
             item+="Product name : "+cartItem.getProductName()+"  Quantity : "+cartItem.getQuantity()+" Total Price : "+cartItem.getTotalPrice()+"<br>";
         }
+        UserEntity userEntity = orderRepository.findByorderId(orderId).getUserEntity();
         emailService.send(userEntity.getEmail(),orderemailbuilder.buildorderplacedcontent(userEntity.getFirstName(),id,status2,orderamount,address,item));
 
 

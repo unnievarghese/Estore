@@ -1,8 +1,10 @@
 package com.example.Estore.Estore.Ui.Controller;
 
+import com.example.Estore.Estore.Exception.ClientSideException;
 import com.example.Estore.Estore.Services.ServiceImpl.OrderServiceImpl;
 import com.example.Estore.Estore.Services.UserService;
 import com.example.Estore.Estore.Shared.dto.User.UserDto;
+import com.example.Estore.Estore.Ui.Model.Response.Messages;
 import com.example.Estore.Estore.Ui.Model.Response.OperationStatusModel;
 import com.example.Estore.Estore.Ui.Model.Response.OrderResponse.OrderResponseModel;
 import com.example.Estore.Estore.Ui.Model.Response.RequestOperationName;
@@ -188,7 +190,9 @@ public class OrderController {
 
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
         UserDto user = userService.getUser(auth.getName());
+
 
         OrderEntity orderEntity=orderService.updateOrderStatus(user.getUserId(),orderId,status);
         return new ModelMapper().map(orderEntity,OrderResponseModel.class);
