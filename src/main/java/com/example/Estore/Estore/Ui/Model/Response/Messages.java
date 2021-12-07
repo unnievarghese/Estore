@@ -48,6 +48,10 @@ public enum Messages {
     INVALID_ORDERID("There is no order with this ID"),
 
 
+    NO_ADDRESS("Both Billing and Shipping address must be set"),
+
+g
+
     INVALID_INPUT("the given input is invalid."),
     PRODUCT_ID_NOT_FOUND("productId not provided"),
     PRODUCT_DOES_NOT_EXIST("Product with given id does not exist,Please verify the id again"),
