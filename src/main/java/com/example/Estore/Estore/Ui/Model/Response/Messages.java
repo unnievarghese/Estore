@@ -16,7 +16,10 @@ public enum Messages {
     EMAIL_ADDRESS_VERIFIED("Email Authentication Successfull"),
     PASSWORD_NOT_MATCHING("Entered passwords are different!"),
     PASSWORD_NOT_CHANGED("Password could not be changed."),
-    PASSWORD_CHANGED("Password Successfully changed.");
+    PASSWORD_CHANGED("Password Successfully changed."),
+    CATEGORY_NOT_FOUND("Provided category not found. Please wait admin to add category"),
+    EMPTY_CATEGORY("No products found in the given category"),
+    PRODUCT_ALREADY_EXISTS("Product already exists. Please update the product quantity");
 
     private String Message;
 

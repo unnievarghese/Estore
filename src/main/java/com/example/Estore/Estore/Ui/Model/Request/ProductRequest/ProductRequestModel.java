@@ -1,7 +1,5 @@
 package com.example.Estore.Estore.Ui.Model.Request.ProductRequest;
 
-import com.example.Estore.Estore.io.Entity.Product.CategoryEntity;
-
 public class ProductRequestModel {
 
     private String productName;
@@ -50,4 +48,9 @@ public class ProductRequestModel {
         this.quantity = quantity;
     }
 
-}
+
+
+    }
+
+
+
