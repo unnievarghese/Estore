@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * This class is used to create a swagger endpoint for login.
+ */
 @RestController
 public class AuthenticationController {
 

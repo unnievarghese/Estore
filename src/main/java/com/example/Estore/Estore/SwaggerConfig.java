@@ -9,10 +9,17 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+/**
+ * Declares a bean and also enables swagger2 for your Spring Boot application.
+ */
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig implements WebMvcConfigurer {
 
+    /**
+     * This class acts a builder and primary interface into the swagger-springmvc framework.
+     * @return Docket Class returns a docket.
+     */
     @Bean
     public Docket apiDocket() {
         Docket docket = new Docket(DocumentationType.SWAGGER_2)
