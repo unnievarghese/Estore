@@ -8,7 +8,6 @@ import com.example.Estore.Estore.Ui.Model.Response.Messages;
 import com.example.Estore.Estore.Ui.Model.Response.WishListRequest.WishListRest;
 import com.example.Estore.Estore.io.Entity.WishList.WishListEntity;
 import com.example.Estore.Estore.io.Repositories.Product.ProductRepository;
-import com.example.Estore.Estore.io.Repositories.WishList.WishListRepository;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import org.modelmapper.ModelMapper;
@@ -78,6 +77,7 @@ public class WishListController {
 
 
         Optional<WishListEntity> wishListEntityList=wishListService.getWishListItem(user);
+
         return wishListEntityList;
 
     }
@@ -102,7 +102,7 @@ public class WishListController {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             UserDto user = userService.getUser(auth.getName());
              wishListService.removeProductFromWishlist(user, ProductId);
-            return Messages.DELETE_SUCCESS.getMessage();
+            return Messages.DELETE_PRODUCT.getMessage();
 
 
         }

@@ -7,6 +7,8 @@ import com.example.Estore.Estore.Ui.Model.Response.OperationStatusModel;
 import com.example.Estore.Estore.Ui.Model.Response.RequestOperationName;
 import com.example.Estore.Estore.Ui.Model.Response.RequestOperationStatus;
 import com.example.Estore.Estore.io.Entity.Cart.CartItemEntity;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -22,7 +24,11 @@ public class CartController {
     CartService cartService;
     @Autowired
     UserService userService;
-
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
     @PostMapping(path = "/add/{productId}")
     public CartItemRest addCartItem(@PathVariable(value = "productId") Long productId,
                                     @RequestParam(value = "quantity") Integer quantity) throws Exception {
@@ -35,7 +41,11 @@ public class CartController {
             return new ModelMapper().map(cartItemEntity, CartItemRest.class);
         }
     }
-
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
     @GetMapping(path = "/get")
     public List<CartItemEntity> getCartById() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

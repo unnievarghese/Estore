@@ -49,7 +49,11 @@ public enum Messages {
     INVALID_INPUT("the given input is invalid."),
     PRODUCT_ID_NOT_FOUND("productId not provided"),
     PRODUCT_DOES_NOT_EXIST("Product with given id does not exist,Please verify the id again"),
-    EMPTY_RECORD("the record is empty");
+    EMPTY_RECORD("the record is empty"),
+    PRODUCT_ALREADY_EXISTS("product already exits."),
+    DELETE_PRODUCT("product deleted successfully"),
+    DELETE_REVIEW("review deleted successfully"),
+    REVIEW_NOT_FOUND("now review found for this productid");
 
 
 

@@ -21,10 +21,10 @@ public interface CartItemRepository extends JpaRepository<CartItemEntity, Long> 
 void deleteProduct(Long productId,UserEntity user);
 
 
-@Query(value = "SELECT * FROM cartitem up where up.product_id=?2 and up.user_id=?1  and up.cart_is_active=1 ",nativeQuery = true)
+@Query(value = "SELECT * FROM cartitem up where up.product_id=?2 and up.user_id=?1  and up.cart_is_active=true ",nativeQuery = true)
    CartItemEntity findByUserEntityANDProductId(UserEntity userEntity, Long productId);
 
-   @Query(value = "SELECT * FROM cartitem cs where cs.cart_is_active=1 and cs.user_id=?1",nativeQuery = true)
+   @Query(value = "SELECT * FROM cartitem cs where cs.cart_is_active=true and cs.user_id=?1",nativeQuery = true)
    List<CartItemEntity> findByCartStatus(UserEntity userEntity);
 
 }

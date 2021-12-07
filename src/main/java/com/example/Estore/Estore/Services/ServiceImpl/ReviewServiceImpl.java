@@ -8,15 +8,13 @@ import com.example.Estore.Estore.Ui.Model.Response.ReviewRequest.ReviewRest;
 import com.example.Estore.Estore.io.Entity.Product.ProductEntity;
 import com.example.Estore.Estore.io.Entity.Review.ReviewEntity;
 import com.example.Estore.Estore.io.Entity.User.UserEntity;
-
+import com.example.Estore.Estore.io.Repositories.Order.OrderRepository;
 import com.example.Estore.Estore.io.Repositories.Product.ProductRepository;
 import com.example.Estore.Estore.io.Repositories.Review.ReviewRepository;
 import com.example.Estore.Estore.io.Repositories.User.UserRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +28,16 @@ public class ReviewServiceImpl {
     UserRepository userRepository;
     @Autowired
     ReviewRepository reviewRepository;
+    @Autowired
+    OrderRepository orderRepository;
 
-
-    //Create review on any product which is there in the database
+    /**
+     * Create review on any product which is there in the database
+     * @param reviewRequestModel
+     * @param user
+     * @return
+     * @throws ClientSideException Throws custom exceptions.
+     */
     public ReviewRest createReviewByUserId(ReviewRequestModel reviewRequestModel, UserDto user) throws Exception {
         UserEntity userEntity = new UserEntity();
         BeanUtils.copyProperties(user, userEntity);
@@ -40,12 +45,11 @@ public class ReviewServiceImpl {
         BeanUtils.copyProperties(reviewRequestModel, reviewEntity);
         Optional<ReviewEntity>optionalReviewEntity=reviewRepository.findByProductIdAndUserId(reviewRequestModel.getProductId(),user.getId());
         ProductEntity productEntity = productRepository.findById(reviewRequestModel.getProductId()).get();
-
-         if (reviewRequestModel.getRating()>5)
+        if (reviewRequestModel.getRating()>5)
         {
             throw new ClientSideException(Messages.INVALID_INPUT.getMessage());
         }
-        else if (optionalReviewEntity.isEmpty()){
+        else if (optionalReviewEntity.isEmpty() ){
 
             reviewEntity.setProductEntity(reviewEntity.getProductEntity());
             reviewEntity.setUserEntity(reviewEntity.getUserEntity());
@@ -58,28 +62,24 @@ public class ReviewServiceImpl {
             ReviewRest reviewRest = new ReviewRest();
             reviewRest.setUserName(userEntity.getFirstName());
             BeanUtils.copyProperties(reviewEntity, reviewRest);
-
-
             return reviewRest;
         }
         else {
-            throw new ClientSideException(Messages.RECORD_ALREADY_EXISTS.getMessage());
+            throw new ClientSideException(Messages.PRODUCT_ALREADY_EXISTS.getMessage());
         }
     }
 
-
-//    public Optional<ReviewEntity> findReviewsByUser(UserDto user) {
-//        UserEntity userEntity = new UserEntity();
-//        BeanUtils.copyProperties(user, userEntity);
-//        Optional<ReviewEntity> reviewEntity= reviewRepository.findAllById(userEntity.getId());
-//        return reviewEntity;
-//    }
-
-
-    //update a review
+    /**
+     * Method to update a review
+     * @param reviewRequestModel
+     * @param user
+     * @return
+     * @throws ClientSideException Throws custom exceptions.
+     */
     public ReviewRest updateReview(ReviewRequestModel reviewRequestModel, UserDto user) {
         UserEntity userEntity = new UserEntity();
         BeanUtils.copyProperties(user, userEntity);
+
 
         Optional<ReviewEntity> reviewEntity=reviewRepository.findByProductIdAndUserId(reviewRequestModel.getProductId(), userEntity.getId());
         if (reviewRequestModel.getRating()>5)
@@ -93,13 +93,18 @@ public class ReviewServiceImpl {
             ReviewRest reviewRest = new ReviewRest();
             reviewRest.setUserName(reviewEntity.get().getUserEntity().getFirstName());
             BeanUtils.copyProperties(updateReview, reviewRest);
-
             return reviewRest;
         }
 
     }
 
-    //Delete a review using userId and productId
+    /**
+     * Method to delete a review using userId and productId
+     * @param user
+     * @param productId
+     * @return
+     * @throws ClientSideException Throws custom exceptions.
+     */
     public ReviewEntity deleteReviewByUser(UserDto user, Long productId) {
         Optional<ReviewEntity> reviewEntity=reviewRepository.findAllByUserIdAndProductId(user.getId(),productId);
         if (reviewEntity.isEmpty())
@@ -113,14 +118,21 @@ public class ReviewServiceImpl {
 
         return null;
     }
-   //get all reviews based on productId
+
+    /**
+     * Method to get all reviews based on productId
+     * @param productId
+     * @param user
+     * @return
+     * @throws ClientSideException Throws custom exceptions.
+     */
     public List<ReviewRest> findReviewByProductId(Long productId,UserDto user) throws Exception {
         UserEntity userEntity = new UserEntity();
         BeanUtils.copyProperties(user, userEntity);
      List<ReviewEntity> reviewEntityList=reviewRepository.findByProductId(productId);
      if (reviewEntityList.isEmpty())
      {
-         throw new ClientSideException(Messages.NO_RECORD_FOUND.getMessage());
+         throw new ClientSideException(Messages.REVIEW_NOT_FOUND.getMessage());
      }
      else{
          List<ReviewRest> reviewRests=new ArrayList<>();
@@ -134,7 +146,13 @@ public class ReviewServiceImpl {
          return reviewRests;
      }
     }
-    //get all reviews done by the user
+
+    /**
+     * Method to get all reviews done by the user.
+     * @param user
+     * @return
+     * @throws ClientSideException Throws custom exceptions.
+     */
     public List<ReviewRest> findReviewByUserId(UserDto user) throws Exception {
         List<ReviewEntity>reviewEntityList=reviewRepository.findReviewByUser(user.getId());
         if ((reviewEntityList.isEmpty()))

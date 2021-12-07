@@ -29,8 +29,13 @@ public class WishListService {
     @Autowired
     ProductRepository productRepository;
 
-
-
+    /**
+     * Method to add a product to the wishlist.
+     * @param userDto
+     * @param ProductId
+     * @return
+     * @throws ClientSideException Throws custom exceptions.
+     */
     public WishListEntity addProductToWishList(UserDto userDto, Long ProductId) throws Exception {
         UserEntity userEntity = new UserEntity();
         BeanUtils.copyProperties(userDto, userEntity);
@@ -49,7 +54,7 @@ public class WishListService {
             for (int i = 0; i < wishlistEntity1.getProductEntityList().size(); i++) {
                 if (productEntity == wishlistEntity1.getProductEntityList().get(i)) {
 
-                    throw new ClientSideException(Messages.RECORD_ALREADY_EXISTS.getMessage());
+                    throw new ClientSideException(Messages.PRODUCT_ALREADY_EXISTS.getMessage());
                 }
 
             }
@@ -60,15 +65,18 @@ public class WishListService {
         return wishListRepository.save(wishlistEntity1);
     }
 
-    //method to view all the wishlist items
+    /**
+     * Method to view all the wishlist items
+     * @param userDto
+     * @return
+     * @throws ClientSideException Throws custom exceptions.
+     */
     public Optional<WishListEntity> getWishListItem(UserDto userDto) {
 
         UserEntity userEntity = new UserEntity();
         BeanUtils.copyProperties(userDto, userEntity);
         Optional<WishListEntity> wishListEntityList = wishListRepository.findAllByUserEntity(userEntity);
-//        if (wishListEntityList.isEmpty()) {
-//            throw new ClientSideException(Messages.NO_RECORD_FOUND.getMessage());
-//        }
+
         if (wishListRepository.findAllByUserEntity(userEntity).get().getProductEntityList().isEmpty())
         {
             throw new ClientSideException(Messages.EMPTY_RECORD.getMessage());
@@ -80,7 +88,13 @@ public class WishListService {
 
     }
 
-    //method to remove a product from the wishlist.
+    /**
+     * Method to remove a product from the wishlist.
+     * @param user
+     * @param productId
+     * @return
+     * @throws ClientSideException Throws custom exceptions.
+     */
     public String removeProductFromWishlist(UserDto user, Long productId) {
         UserEntity userEntity = new UserEntity();
         BeanUtils.copyProperties(user, userEntity);
@@ -90,16 +104,19 @@ public class WishListService {
         int i=0;
         while (i<=wishListEntity1.getProductEntityList().size())
         {
-            if (Objects.equals(productId, wishListEntity1.getProductEntityList().get(i).getProductId()))
+            if (wishListEntity1.getProductEntityList().isEmpty())
+            {
+                throw new ClientSideException(Messages.EMPTY_RECORD.getMessage());
+            }
+            else if (Objects.equals(productId, wishListEntity1.getProductEntityList().get(i).getProductId()))
             {
                 wishListRepository.deleteProduct(wishListId,productId);
-                return Messages.DELETE_SUCCESS.getMessage();
+                return Messages.DELETE_PRODUCT.getMessage();
             }
             else if (!Objects.equals(productId, wishListEntity1.getProductEntityList().get(i).getProductId()))
                 throw new ClientSideException(Messages.PRODUCT_DOES_NOT_EXIST.getMessage());
             i++;
         }
-
         return null;
     }
 }

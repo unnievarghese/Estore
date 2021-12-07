@@ -124,6 +124,7 @@ public class UserServiceImpl implements UserService {
                 buildRegistrationContent(userEntity.getFirstName(), link));
 
 
+
         return new ModelMapper().map(storedUserDetails,UserDto.class);
 
 

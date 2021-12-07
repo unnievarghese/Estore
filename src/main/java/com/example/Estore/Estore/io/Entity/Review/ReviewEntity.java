@@ -38,7 +38,7 @@ public class ReviewEntity {
     public ReviewEntity(String review, Integer rating, ProductEntity productEntity, UserEntity userEntity) {
 
         this.review = review;
-        this.rating = rating;
+        this.rating=rating;
         this.productEntity = productEntity;
         this.userEntity = userEntity;
     }

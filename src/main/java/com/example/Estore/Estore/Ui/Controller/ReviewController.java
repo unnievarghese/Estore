@@ -64,6 +64,7 @@ public class ReviewController {
      * Method to update the review done by the user.
      * @param reviewRequestModel
      * @return ResponseEntity
+     * @throws ClientSideException throws custom exception
      */
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authorization",
@@ -104,9 +105,7 @@ public class ReviewController {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             UserDto user = userService.getUser(auth.getName());
             ReviewEntity reviewEntity = reviewService.deleteReviewByUser(user, ProductId);
-             return Messages.DELETE_SUCCESS.getMessage();
-
-
+             return Messages.DELETE_REVIEW.getMessage();
         }
     }
 
@@ -146,8 +145,4 @@ public class ReviewController {
         List<ReviewRest> reviewRest=reviewService.findReviewByUserId(user);
         return reviewRest;
     }
-
-
-
-
 }
