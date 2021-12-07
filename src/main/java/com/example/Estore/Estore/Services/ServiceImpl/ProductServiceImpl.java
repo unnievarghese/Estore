@@ -48,20 +48,20 @@ public class ProductServiceImpl implements ProductService {
         return returnValue;
     }
 
-   @Override
-   public List<ProductDto> getProducts(int page, int limit)
-   {
-       List<ProductDto> returnValue = new ArrayList<>();
-       Pageable pageableRequest = PageRequest.of(page,limit);
-       Page<ProductEntity> productsPage = productRepository.findAll(pageableRequest);
-       List<ProductEntity> products = productsPage.getContent();
+    @Override
+    public List<ProductDto> getProducts(int page, int limit)
+    {
+        List<ProductDto> returnValue = new ArrayList<>();
+        Pageable pageableRequest = PageRequest.of(page,limit);
+        Page<ProductEntity> productsPage = productRepository.findAll(pageableRequest);
+        List<ProductEntity> products = productsPage.getContent();
 
-       for (ProductEntity productEntity : products){
-           ProductDto productDto = new ModelMapper().map(productEntity,ProductDto.class);
-           returnValue.add(productDto);
-       }
-       return returnValue;
-   }
+        for (ProductEntity productEntity : products){
+            ProductDto productDto = new ModelMapper().map(productEntity,ProductDto.class);
+            returnValue.add(productDto);
+        }
+        return returnValue;
+    }
 
     @Override
     public ProductEntity findByProductName(String productName) {
@@ -81,28 +81,28 @@ public class ProductServiceImpl implements ProductService {
 
         if (productRepository.getById(productId).getProductId().equals(productId)){
             productRepository.deleteById(productId);
-     }
+        }
 
     }
 
     @Override
     public ProductEntity updateProduct(Long productId, ProductRequestModel productDetails) throws ClientSideException {
 
-       ProductEntity product = productRepository.findByProductId(productId);
+        ProductEntity product = productRepository.findByProductId(productId);
 
-       if (product == null) throw new ClientSideException(Messages.NO_RECORD_FOUND.getMessage());
+        if (product == null) throw new ClientSideException(Messages.NO_RECORD_FOUND.getMessage());
 
-       else
+        else
 
-           product.setProductName(productDetails.getProductName());
-           product.setPrice(productDetails.getPrice());
-           product.setDescription(productDetails.getDescription());
-           product.setQuantity(productDetails.getQuantity());
-           CategoryEntity categoryEntity = categoryRepository.findByCategoryName(productDetails.getCategoryName());
-           product.setCategoryDetails(categoryEntity);
-           System.out.println(categoryEntity);
-           productRepository.save(product);
-           return product;
+            product.setProductName(productDetails.getProductName());
+        product.setPrice(productDetails.getPrice());
+        product.setDescription(productDetails.getDescription());
+        product.setQuantity(productDetails.getQuantity());
+        CategoryEntity categoryEntity = categoryRepository.findByCategoryName(productDetails.getCategoryName());
+        product.setCategoryDetails(categoryEntity);
+        System.out.println(categoryEntity);
+        productRepository.save(product);
+        return product;
 
     }
 
@@ -117,4 +117,3 @@ public class ProductServiceImpl implements ProductService {
     }
 
 }
-

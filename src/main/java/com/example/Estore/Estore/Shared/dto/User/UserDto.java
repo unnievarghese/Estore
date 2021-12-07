@@ -22,6 +22,7 @@ public class UserDto implements Serializable {
     private List<AddressDto> address;
     private CardDto cardDetails;
 
+
     /**
      * Method is used to get database id.
      * @return long
@@ -29,6 +30,7 @@ public class UserDto implements Serializable {
     public long getId() {
         return id;
     }
+
 
     /**
      * Method is used to get unique id generated for user.
@@ -38,6 +40,7 @@ public class UserDto implements Serializable {
         return userId;
     }
 
+
     /**
      * Method is used to get firstName.
      * @return String.
@@ -45,6 +48,7 @@ public class UserDto implements Serializable {
     public String getFirstName() {
         return firstName;
     }
+
 
     /**
      * Method is used to get lastName.
@@ -54,6 +58,7 @@ public class UserDto implements Serializable {
         return lastName;
     }
 
+
     /**
      * Method is used to get email.
      * @return String.
@@ -61,6 +66,7 @@ public class UserDto implements Serializable {
     public String getEmail() {
         return email;
     }
+
 
     /**
      * Method is used to get password.
@@ -70,6 +76,7 @@ public class UserDto implements Serializable {
         return password;
     }
 
+
     /**
      * Method is used to get encrypted password.
      * @return String.
@@ -78,6 +85,7 @@ public class UserDto implements Serializable {
         return encryptedPassword;
     }
 
+
     /**
      * Method is used to get email verification token.
      * @return String.
@@ -85,6 +93,7 @@ public class UserDto implements Serializable {
     public String getEmailVerificationToken() {
         return emailVerificationToken;
     }
+
 
     /**
      * Method is used get email verification status.

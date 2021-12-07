@@ -3,7 +3,9 @@ package com.example.Estore.Estore.Shared.dto.Product;
 import java.io.Serializable;
 
 public class ProductDto implements Serializable {
-    private Long productId;
+
+    private Long productId ;
+
     private String productName;
     private String description;
     private int price;
@@ -18,6 +20,7 @@ public class ProductDto implements Serializable {
         this.categoryName = categoryName;
     }
 
+
     public Long getProductId() {
         return productId;
     }
@@ -25,6 +28,7 @@ public class ProductDto implements Serializable {
     public void setProductId(Long productId) {
         this.productId = productId;
     }
+
 
     public String getProductName() {
         return productName;

@@ -123,7 +123,11 @@ public class UserServiceImpl implements UserService {
         emailService.send(userEntity.getEmail(), emailBuilder.
                 buildRegistrationContent(userEntity.getFirstName(), link));
 
-        return new ModelMapper().map(storedUserDetails, UserDto.class);
+
+
+        return new ModelMapper().map(storedUserDetails,UserDto.class);
+
+
     }
 
     /**
@@ -285,6 +289,7 @@ public class UserServiceImpl implements UserService {
         Collection<RoleEntity> arrayList = new ArrayList<RoleEntity>();
         arrayList.add(roleEntity);
         userEntity.setRoles(arrayList);
+        userEntity.setEmailVerificationStatus(true);
         UserEntity storedUserDetails;
         try{
             storedUserDetails = userRepository.save(userEntity);
@@ -292,7 +297,9 @@ public class UserServiceImpl implements UserService {
         catch (Exception e){
             throw new ClientSideException(Messages.FAILED_DB_SAVE.getMessage());
         }
+
         return new ModelMapper().map(storedUserDetails,UserDto.class);
+
     }
 
     /**

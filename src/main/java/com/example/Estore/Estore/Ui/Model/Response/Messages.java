@@ -25,11 +25,9 @@ public enum Messages {
     PASSWORD_NOT_MATCHING("Entered passwords are different!"),
     PASSWORD_NOT_CHANGED("Password could not be changed."),
     PASSWORD_CHANGED("Password Successfully changed."),
-
     CATEGORY_NOT_FOUND("Provided category not found. Please wait admin to add category"),
     EMPTY_CATEGORY("No products found in the given category"),
     PRODUCT_ALREADY_EXISTS("Product already exists. Please update the product quantity"),
-
     PASSWORD_TOKEN_EXPIRED("Token expired! Try to generate new passwword reset link."),
     NO_ACCESS("You have no access to this account."),
     RESEND_EMAIL("Account already created for this email.Please complete email verification,or generate a new " +
@@ -56,6 +54,7 @@ public enum Messages {
     OUT_OF_STOCK("required quantity not available,Please wait for the seller to add products"),
     CART_NOT_ACTIVE("Cart is not active,Please verify id again!"),
     CART_IS_EMPTY("Your cart is empty, Please add products!");
+
 
 
 

@@ -21,6 +21,7 @@ public class AppProperties {
      * @return String.
      */
     public String getTokenSecret(){
+
         return env.getProperty("tokenSecret");
     }
 }

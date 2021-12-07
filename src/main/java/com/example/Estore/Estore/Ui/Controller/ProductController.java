@@ -94,7 +94,7 @@ Update product details by productId
     public ProductRest updateProduct(@PathVariable("id") Long productId,@RequestBody ProductRequestModel productDetails)
             throws Exception {
         ProductEntity updateProduct = productService.updateProduct(productId,productDetails);
-                return new ModelMapper().map(updateProduct,ProductRest.class);
+        return new ModelMapper().map(updateProduct,ProductRest.class);
     }
 
 
@@ -122,7 +122,7 @@ Get all products
     @GetMapping(path = "/get-products")
 
     public ResponseEntity <ProductRest>getProducts(@RequestParam(value = "page",defaultValue = "0") int page,
-                                                    @RequestParam(value = "limit",defaultValue = "2")int limit)
+                                                   @RequestParam(value = "limit",defaultValue = "2")int limit)
     {
         List<ProductRest> returnValue = new ArrayList<>();
         List<ProductDto> products = productService.getProducts(page,limit);
@@ -135,7 +135,7 @@ Get all products
 
 
 
-                                                   }
+    }
 /*
 Find product by productId
 */
@@ -224,7 +224,7 @@ Delete product by productId
      * @return category
      * @throws Exception
      */
-   //http://localhost:8080/estore/products/category-add
+    //http://localhost:8080/estore/products/category-add
 
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authorization",
@@ -237,9 +237,9 @@ Delete product by productId
     {
 
         CategoryRest category = productService.addCategory(categoryRequestModel);
-      return new  ResponseEntity(category,HttpStatus.CREATED);
+        return new  ResponseEntity(category,HttpStatus.CREATED);
 
-   }
+    }
 
 
 }

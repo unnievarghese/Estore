@@ -36,7 +36,6 @@ public class UserController {
     @Autowired
     UserService userService;
 
-
     /**
      * Method is used to create a Buyer,gets userDetails,creates a dto and passes it to service layer.
      * @param  userDetails contains user entered information.

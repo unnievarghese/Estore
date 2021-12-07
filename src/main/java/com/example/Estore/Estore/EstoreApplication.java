@@ -2,6 +2,7 @@ package com.example.Estore.Estore;
 
 import com.example.Estore.Estore.Security.AppProperties;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -10,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  * Initiates Java-based Spring configuration, component scanning, and enable auto-configuration feature.
  */
 @SpringBootApplication
+@EnableAutoConfiguration
 public class EstoreApplication {
 
 	/**

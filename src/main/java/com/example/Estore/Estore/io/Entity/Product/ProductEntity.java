@@ -52,7 +52,7 @@ public class ProductEntity implements Serializable {
         this.productId = productId;
     }
 
-//    @ManyToMany(mappedBy = "productEntityList", fetch = FetchType.LAZY)
+    //    @ManyToMany(mappedBy = "productEntityList", fetch = FetchType.LAZY)
 //    @JsonIgnore
 /*
     To get product name
@@ -124,4 +124,3 @@ public class ProductEntity implements Serializable {
         this.createTime = createTime;
     }
 }
-

@@ -4,6 +4,7 @@ import com.example.Estore.Estore.io.Entity.User.AddressEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+
 /**
  * This interface is used to access the database.
  */
@@ -15,5 +16,6 @@ public interface AddressRepository extends CrudRepository<AddressEntity , Long> 
      * @param addressId unique addressId generated for each address.
      * @return AddressEntity.
      */
+
     AddressEntity findByAddressId(String addressId);
 }
