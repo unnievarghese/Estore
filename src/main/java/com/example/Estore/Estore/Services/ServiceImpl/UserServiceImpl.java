@@ -289,7 +289,7 @@ public class UserServiceImpl implements UserService {
         Collection<RoleEntity> arrayList = new ArrayList<RoleEntity>();
         arrayList.add(roleEntity);
         userEntity.setRoles(arrayList);
-
+        userEntity.setEmailVerificationStatus(true);
         UserEntity storedUserDetails;
         try{
             storedUserDetails = userRepository.save(userEntity);
