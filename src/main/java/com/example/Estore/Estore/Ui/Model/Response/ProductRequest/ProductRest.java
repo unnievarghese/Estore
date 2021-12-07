@@ -6,6 +6,15 @@ public class ProductRest {
     private String productName;
     private String description;
     private int price;
+    private String categoryName;
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
 
     public Long getProductId() {
         return productId;

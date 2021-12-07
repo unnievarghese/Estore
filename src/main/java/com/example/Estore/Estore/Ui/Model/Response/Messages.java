@@ -26,6 +26,7 @@ public enum Messages {
     PASSWORD_NOT_CHANGED("Password could not be changed."),
 
 
+
     PASSWORD_CHANGED("Password Successfully changed."),
 
     PASSWORD_TOKEN_EXPIRED("Token expired! Try to generate new passwword reset link."),
@@ -62,7 +63,13 @@ public enum Messages {
 
     CART_NOT_ACTIVE("Cart is not active,Please verify id again!"),
 
-    CART_IS_EMPTY("Your cart is empty, Please add products!");
+    CART_IS_EMPTY("Your cart is empty, Please add products!"),
+
+
+
+
+    CATEGORY_NOT_FOUND("Provided category not found. Please wait admin to add category"),
+    EMPTY_CATEGORY("No products found in the given category");
 
 
 

@@ -10,6 +10,15 @@ public class ProductDto implements Serializable {
     private String description;
     private int price;
     private int quantity;
+    private String categoryName;
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
 
 
     public Long getProductId() {
