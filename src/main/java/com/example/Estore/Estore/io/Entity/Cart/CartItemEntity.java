@@ -1,8 +1,10 @@
 package com.example.Estore.Estore.io.Entity.Cart;
+
 import com.example.Estore.Estore.io.Entity.Product.ProductEntity;
 import com.example.Estore.Estore.io.Entity.User.UserEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.UpdateTimestamp;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -21,7 +23,7 @@ public class CartItemEntity {
     private int quantity;
     @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="user_id")
+    @JoinColumn(name = "user_id")
     private UserEntity userEntity;
     private String productName;
     private Date createdDate;
@@ -30,7 +32,9 @@ public class CartItemEntity {
 
     private double totalPrice;
 
-    private boolean cartIsActive= true;
+    private boolean cartIsActive = true;
+    private int discount;
+
 
     public boolean isCartIsActive() {
         return cartIsActive;
@@ -95,6 +99,14 @@ public class CartItemEntity {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public int getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(int discount) {
+        this.discount = discount;
     }
 
     public double getTotalPrice() {

@@ -16,7 +16,13 @@ public enum Messages {
     EMAIL_ADDRESS_VERIFIED("Email Authentication Successfull"),
     PASSWORD_NOT_MATCHING("Entered passwords are different!"),
     PASSWORD_NOT_CHANGED("Password could not be changed."),
-    PASSWORD_CHANGED("Password Successfully changed.");
+    PASSWORD_CHANGED("Password Successfully changed."),
+    OUT_OF_STOCK("required quantity not available,Please wait for the seller to add products"),
+    PRODUCT_DOES_NOT_EXIST("Product with given id does not Exists,Please verify the id again!"),
+    CART_NOT_ACTIVE("Cart is not active,Please verify id again!"),
+    PRODUCT_ID_NOT_FOUND("productId not provided"),
+    CART_IS_EMPTY("Your cart is empty, Please add products!");
+
 
     private String Message;
 

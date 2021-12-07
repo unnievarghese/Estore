@@ -4,6 +4,8 @@ import com.example.Estore.Estore.Shared.dto.Product.ProductDto;
 import com.example.Estore.Estore.Ui.Model.Request.ProductRequest.ProductRequestModel;
 import com.example.Estore.Estore.Ui.Model.Response.ProductRequest.ProductRest;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,14 @@ public String getProduct()
     {
         return "get product was called";
     }
+
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
+
+
     @PostMapping
     public ProductRest createProduct(@RequestBody ProductRequestModel productDetails) throws Exception{
         System.out.println("product");
