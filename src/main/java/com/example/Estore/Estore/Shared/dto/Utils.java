@@ -43,11 +43,13 @@ public class Utils {
     }
 
 
+
     /**
      * Method is used to generate a Jwt token for email verification.
      * @param userId userId to be used as subject.
      * @return String.
      */
+
     public String generateEmailVerificationToken(String userId){
         String token = Jwts.builder()
                 .setSubject(userId)

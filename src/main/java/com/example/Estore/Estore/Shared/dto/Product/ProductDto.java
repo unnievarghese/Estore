@@ -4,8 +4,6 @@ import java.io.Serializable;
 
 public class ProductDto implements Serializable {
 
-
-
     private Long productId ;
 
     private String productName;
@@ -13,6 +11,14 @@ public class ProductDto implements Serializable {
     private int price;
     private int quantity;
 
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
 
 
     public String getProductName() {

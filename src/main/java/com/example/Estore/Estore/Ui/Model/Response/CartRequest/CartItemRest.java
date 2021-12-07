@@ -1,9 +1,21 @@
 package com.example.Estore.Estore.Ui.Model.Response.CartRequest;
 
+
+import java.util.Date;
+
 public class CartItemRest {
     private String productName;
     private Integer quantity;
     private double totalPrice;
+    private Date createdDate;
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
 
     public String getProductName() {
         return productName;

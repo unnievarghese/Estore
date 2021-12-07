@@ -36,11 +36,6 @@ public class WishListEntity {
 
     @ElementCollection
     private List<ProductEntity> productEntityList=new ArrayList<ProductEntity>();
-
-
-
-
-
     @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id",referencedColumnName = "userId")

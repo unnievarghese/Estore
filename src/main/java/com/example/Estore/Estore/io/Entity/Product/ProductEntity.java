@@ -12,6 +12,7 @@ import java.io.Serializable;
 public class ProductEntity implements Serializable {
     @Id
     @GeneratedValue
+
     private Long productId;
     @Column(nullable = false)
     private String productName;

@@ -25,6 +25,7 @@ public enum Messages {
     PASSWORD_NOT_MATCHING("Entered passwords are different!"),
     PASSWORD_NOT_CHANGED("Password could not be changed."),
 
+
     PASSWORD_CHANGED("Password Successfully changed."),
 
     PASSWORD_TOKEN_EXPIRED("Token expired! Try to generate new passwword reset link."),
@@ -53,7 +54,15 @@ public enum Messages {
     PRODUCT_ALREADY_EXISTS("product already exits."),
     DELETE_PRODUCT("product deleted successfully"),
     DELETE_REVIEW("review deleted successfully"),
-    REVIEW_NOT_FOUND("now review found for this productid");
+    REVIEW_NOT_FOUND("now review found for this productid"),
+
+
+
+    OUT_OF_STOCK("required quantity not available,Please wait for the seller to add products"),
+
+    CART_NOT_ACTIVE("Cart is not active,Please verify id again!"),
+
+    CART_IS_EMPTY("Your cart is empty, Please add products!");
 
 
 

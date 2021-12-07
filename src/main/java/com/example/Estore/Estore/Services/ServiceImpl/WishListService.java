@@ -101,6 +101,7 @@ public class WishListService {
         Optional<WishListEntity> wishListEntity=wishListRepository.findAllByUserEntity(userEntity);
         WishListEntity wishListEntity1=wishListEntity.get();
         Long wishListId=wishListEntity1.getWishListId();
+
         int i=0;
         while (i<=wishListEntity1.getProductEntityList().size())
         {
@@ -117,6 +118,10 @@ public class WishListService {
                 throw new ClientSideException(Messages.PRODUCT_DOES_NOT_EXIST.getMessage());
             i++;
         }
+
+        wishListRepository.deleteProduct(wishListId,productId);
+
+
         return null;
     }
 }
