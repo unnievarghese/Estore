@@ -9,6 +9,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
+import java.rmi.AccessException;
 
 /**
  * Class is used to throw exception for wrong credentials and absent/wrong authorizations.
@@ -46,8 +48,19 @@ public class LogInException implements AuthenticationEntryPoint {
     @ExceptionHandler(value = {Exception.class})
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          Exception exception) throws IOException {
-        // 500
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error : " + exception.getMessage());
-    }
 
+        if(exception.toString().contains("AccessDeniedException")) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            JSONObject json = new JSONObject();
+            json.put("httpStatus","Unauthorized client error");
+            json.put("message", "Access Denied!");
+            response.getWriter().write(json.toJSONString());
+        }
+        else {
+            //500
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal Server Error : " + exception.getMessage());
+        }
+    }
 }
