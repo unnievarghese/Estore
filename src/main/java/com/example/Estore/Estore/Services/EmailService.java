@@ -10,5 +10,5 @@ public interface EmailService {
      * @param to Email id provided by the user.
      * @param email The body of the email.
      */
-    void send(String to,String email);
+    boolean send(String to,String email);
 }

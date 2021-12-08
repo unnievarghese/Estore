@@ -17,6 +17,7 @@ public interface WishListRepository extends CrudRepository<WishListEntity, Long>
 
     Optional<WishListEntity> findAllByUserEntity(UserEntity userEntity);
 
+    WishListEntity findByUserEntity(UserEntity userEntity);
 
     WishListEntity findAllByWishListId(Long wishListId);
 
