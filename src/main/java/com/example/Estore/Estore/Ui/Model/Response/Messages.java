@@ -33,6 +33,7 @@ public enum Messages {
     RESEND_EMAIL("Account already created for this email.Please complete email verification,or generate a new " +
             "email verification link."),
     FAILED_DB_SAVE("Saving to Database failed! please try again."),
+    ACCOUNT_ACTIVE("Account already active"),
     EMPTY_CART("There are no products in the cart"),
     INVALID_PRODUCTID("No product with this ID added to cart"),
     NO_ORDER("No order history with the user"),

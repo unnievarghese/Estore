@@ -9,11 +9,16 @@ import com.example.Estore.Estore.Shared.dto.User.AddressDto;
 import com.example.Estore.Estore.Shared.dto.User.CardDto;
 import com.example.Estore.Estore.Shared.dto.User.UserDto;
 import com.example.Estore.Estore.Ui.Model.Response.Messages;
+import com.example.Estore.Estore.io.Entity.Cart.CartItemEntity;
+import com.example.Estore.Estore.io.Entity.Order.OrderEntity;
+import com.example.Estore.Estore.io.Entity.Review.ReviewEntity;
 import com.example.Estore.Estore.io.Entity.User.*;
-import com.example.Estore.Estore.io.Repositories.User.AddressRepository;
-import com.example.Estore.Estore.io.Repositories.User.PasswordResetTokenRepository;
-import com.example.Estore.Estore.io.Repositories.User.RoleRepository;
-import com.example.Estore.Estore.io.Repositories.User.UserRepository;
+import com.example.Estore.Estore.io.Entity.WishList.WishListEntity;
+import com.example.Estore.Estore.io.Repositories.Cart.CartItemRepository;
+import com.example.Estore.Estore.io.Repositories.Order.OrderRepository;
+import com.example.Estore.Estore.io.Repositories.Review.ReviewRepository;
+import com.example.Estore.Estore.io.Repositories.User.*;
+import com.example.Estore.Estore.io.Repositories.WishList.WishListRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +32,8 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+
+import java.util.*;
 
 /**
  * This class implements UserService interface and provides some business functionalities.
@@ -73,6 +76,18 @@ public class UserServiceImpl implements UserService {
      */
     @Autowired
     AddressRepository addressRepository;
+
+    @Autowired
+    WishListRepository wishListRepository;
+
+    @Autowired
+    CartItemRepository cartItemRepository;
+
+    @Autowired
+    ReviewRepository reviewRepository;
+
+    @Autowired
+    OrderRepository orderRepository;
 
     /**
      * Method to create Buyer,gets user details from controller and saves it to database.
@@ -395,6 +410,31 @@ public class UserServiceImpl implements UserService {
         if(passwordResetTokenEntity != null){
             passwordResetTokenRepository.delete(passwordResetTokenEntity);
         }
+        WishListEntity wishListEntity = wishListRepository.findByUserEntity(userEntity);
+        if(wishListEntity != null) {
+            userRepository.deleteWishListProductList(wishListEntity);
+            userRepository.deleteWishList(userEntity);
+        }
+        List<CartItemEntity> cartItemEntity = cartItemRepository.findByUserEntity(userEntity);
+        if (!cartItemEntity.isEmpty()) {
+            for (CartItemEntity cartItem : cartItemEntity) {
+                cartItem.setUserEntity(userRepository.findByEmail("admin@gmail.com"));
+            }
+        }
+        List<ReviewEntity> reviewEntityList = reviewRepository.findReviewByUser(userEntity.getId());
+        if(!reviewEntityList.isEmpty()){
+            for(ReviewEntity review : reviewEntityList){
+                review.setUserEntity(userRepository.findByEmail("admin@gmail.com"));
+            }
+        }
+        List<OrderEntity> orderEntities = orderRepository.findByuserId(userEntity.getId());
+        if(!orderEntities.isEmpty()){
+            for(OrderEntity order : orderEntities){
+                order.setUserEntity(userRepository.findByEmail("admin@gmail.com"));
+                order.setBillingAddress(null);
+                order.setShippingAddress(null);
+            }
+        }
         userRepository.deleteAddress(userEntity);
         userRepository.deleteCard(userEntity);
         userRepository.deleteRole(userEntity);
@@ -415,23 +455,41 @@ public class UserServiceImpl implements UserService {
      * Method to activate the user,gets the user and toggles the email verification status to true if
      * its admin in case it's the user itself then sends an email verification link to the user
      * @param userId contains the unique string id generated for each user.
-     * @return String.
+     * @return integer.
      */
     @Override
-    public String activateUser(String userId) {
+    public int activateUserByAdmin(String userId) {
         String auth = SecurityContextHolder.getContext().getAuthentication().toString();
-        if(auth.contains("ROLE_ADMIN")) {
-            if(userRepository.activateUser(userId)==1) return "success";
+        if(!auth.contains("ROLE_ADMIN")) {
+            throw new ClientSideException(Messages.NO_ACCESS.getMessage());
         }
         UserEntity userEntity = userRepository.findByUserId(userId);
+        if(userEntity == null)
+            throw new ClientSideException(Messages.EMAIL_NOT_FOUND.getMessage());
+        if(userEntity.getEmailVerificationStatus())
+            throw new ClientSideException(Messages.ACCOUNT_ACTIVE.getMessage());
+        return (userRepository.activateUser(userId));
+    }
+
+    /**
+     * Method to activate the user,gets the email and sends an activation link.
+     * @param email contains email entered by the user.
+     * @return boolean.
+     */
+    @Override
+    public boolean activateUserByUser(String email) {
+        UserEntity userEntity = userRepository.findByEmail(email);
+        if(userEntity == null)
+            throw new ClientSideException(Messages.EMAIL_NOT_FOUND.getMessage());
+        if(userEntity.getEmailVerificationStatus())
+            throw new ClientSideException(Messages.ACCOUNT_ACTIVE.getMessage());
         String token = utils.generateEmailVerificationToken(userEntity.getUserId());
         userEntity.setEmailVerificationToken(token);
         userRepository.save(userEntity);
         String link = SecurityConstants.USER_CREATE_EMAIL_LINK + token;
         EmailBuilder emailBuilder = new EmailBuilder();
-        emailService.send(userEntity.getEmail(), emailBuilder.
+        return emailService.send(userEntity.getEmail(), emailBuilder.
                 buildUserActivateContent(userEntity.getFirstName(), link));
-        return "emailsent";
     }
 
     /**

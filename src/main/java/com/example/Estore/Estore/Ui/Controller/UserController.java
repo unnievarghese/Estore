@@ -270,7 +270,7 @@ public class UserController {
     }
 
     /**
-     * Method to Activate a user.
+     * Method to Activate a user by admin.
      * @param userId contains the unique string id generated for each user.
      * @return ResponseEntity<String>
      * @throws ClientSideException Throws custom exceptions.
@@ -282,10 +282,25 @@ public class UserController {
                     paramType = "header")
     })
     @PostMapping(path = "/user/activate/{userId}")
-    public ResponseEntity<String> activateUser(@PathVariable String userId) throws ClientSideException{
-        String operationResult = userService.activateUser(userId);
-        if(operationResult.equals("success"))
+    public ResponseEntity<String> activateUserByadmin(@PathVariable String userId) throws ClientSideException{
+        int operationResult = userService.activateUserByAdmin(userId);
+        if(operationResult == 1)
             return new ResponseEntity<String>(Messages.ACTIVATE_SUCCESS.getMessage(),HttpStatus.OK);
         return new ResponseEntity<String>(Messages.EMAIL_SENT.getMessage(),HttpStatus.OK);
+    }
+
+    /**
+     * Method to Activate the user by the user.
+     * @param emailRequestModel contains the email entered by user.
+     * @return                  ResponseEntity.
+     * @throws ClientSideException Throws custom exceptions.
+     */
+//    http://localhost:8080/estore/home/user/activate
+    @PostMapping(path = "/user/activate")
+    public ResponseEntity<String> activateUserByUser(@RequestBody EmailRequestModel emailRequestModel) throws ClientSideException{
+        boolean operationResult = userService.activateUserByUser(emailRequestModel.getEmail());
+        if(operationResult)
+            return new ResponseEntity<String>(Messages.EMAIL_SENT.getMessage(),HttpStatus.OK);
+        return new ResponseEntity<String>(Messages.EMAIL_NOT_SENT.getMessage(),HttpStatus.OK);
     }
 }

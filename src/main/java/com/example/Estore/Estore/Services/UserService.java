@@ -78,11 +78,18 @@ public interface UserService extends UserDetailsService {
     int deactivateUser(String userId);
 
     /**
-     * Method to activate the user,gets the user and toggles the email verification status to false.
+     * Method to activate the user,gets the user and toggles the email verification status to true.
      * @param userId contains the unique string id generated for each user.
      * @return integer.
      */
-    String activateUser(String userId);
+    int activateUserByAdmin(String userId);
+
+    /**
+     * Method to activate the user,gets the user email and sends an activation link.
+     * @param email contains email entered by the user.
+     * @return boolean.
+     */
+    boolean activateUserByUser(String email);
 
     /**
      * Method to verify email token, gets token from controller and verifies it.
