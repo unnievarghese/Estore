@@ -41,7 +41,7 @@ public enum Messages {
     USER_CANCELLED("User Cancelled the order"),
     INVALID_ORDERID("There is no order with this ID"),
     NO_ADDRESS("Both Billing and Shipping address must be set"),
-    INVALID_INPUT("the given input is invalid."),
+    INVALID_INPUT("the rating should be out of 5"),
     PRODUCT_ID_NOT_FOUND("productId not provided"),
     PRODUCT_DOES_NOT_EXIST("Product with given id does not exist,Please verify the id again"),
     EMPTY_RECORD("the record is empty"),
