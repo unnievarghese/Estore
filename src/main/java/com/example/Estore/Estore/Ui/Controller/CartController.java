@@ -15,6 +15,9 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +34,7 @@ public class CartController {
 
     /**
      * Method for adding products and quantity to cart of login user
+     *
      * @param productId unique id of product
      * @param quantity  count of products needed to be added to cart
      * @return CartItemRest Added item ,quantity, price,created date
@@ -38,7 +42,6 @@ public class CartController {
      */
 
 //  http://localhost:8080/Estore/cart/addProduct/{productId}?quantity={?}
-
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authorization",
                     value = "${userController.authorizationHeader.description}",
@@ -63,11 +66,11 @@ public class CartController {
 
     /**
      * Method for fetching all the items in a cart of Login user
+     *
      * @return CartCost All the items in cart along with total cost
      */
 
 //  http://localhost:8080/Estore/cart/fetch
-
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authorization",
                     value = "${userController.authorizationHeader.description}",
@@ -75,7 +78,7 @@ public class CartController {
     })
 
     @GetMapping(path = "/fetch")
-    public CartCost getCartByUserId() throws ClientSideException{
+    public CartCost getCartByUserId() throws ClientSideException {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
@@ -86,6 +89,7 @@ public class CartController {
 
     /**
      * Method for deleting particular product from Cart of login user
+     *
      * @param productId unique id of product
      * @return OperationStatusModel whether the operation is success or not
      * @throws ClientSideException throws custom Exception
@@ -116,6 +120,7 @@ public class CartController {
 
     /**
      * Method for adding quantity of active product inside cart of login user
+     *
      * @param productId unique id of product
      * @param quantity  count of product that needs to be increased
      * @return CartItemRest
@@ -146,6 +151,7 @@ public class CartController {
 
     /**
      * Method for reducing quantity of active product inside cart of login user
+     *
      * @param productId unique id of product
      * @param quantity  count of products that needs to be reduced
      * @return CartItemRest
@@ -175,6 +181,7 @@ public class CartController {
 
     /**
      * Method for adding wishlist to cart
+     *
      * @param wishlistid unique id of wishlist
      * @param quantity   count of products that needs to be added to cart
      * @return String message whether wishlist is added to cart or not
@@ -200,6 +207,7 @@ public class CartController {
 
     /**
      * Method for fetching a particular product from cart
+     *
      * @param productId unique id of product
      * @return CartItemRest
      */
@@ -223,6 +231,7 @@ public class CartController {
 
     /**
      * Method for adding discount for a particular user by the seller in case of any disputes in previous orders
+     *
      * @param discount integer value of discount that needs to be applied
      * @return String Discount applied successfully
      */
@@ -235,11 +244,26 @@ public class CartController {
     })
 
     @PostMapping(path = "/applyDiscount")
-    public String applyDiscount(@RequestParam(value = "discount",defaultValue = "0") int discount) throws ClientSideException{
+    public String applyDiscount(@RequestParam(value = "discount", defaultValue = "0") int discount) throws ClientSideException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
-        return cartService.applyPromoCode(user,discount);
+        return cartService.applyPromoCode(user, discount);
     }
+
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "authorization",
+//                    value = "${userController.authorizationHeader.description}",
+//                    paramType = "header")
+//    })
+//    @Secured("ROLE_ADMIN")
+//    @PostMapping(path = "/email")
+//    public ResponseEntity<String> sendMail(@PathVariable(value = "user_id") Long id) {
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        UserDto user = userService.getUser(auth.getName());
+//        cartService.abandonedCartMail(id);
+//        return new ResponseEntity<String>(Messages.EMAIL_SUCCESS.getMessage(), HttpStatus.OK);
+//
+//    }
 
 }
 

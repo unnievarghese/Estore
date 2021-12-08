@@ -53,7 +53,8 @@ public enum Messages {
     CART_NOT_ACTIVE("Cart is not active,Please verify id again!"),
     CART_IS_EMPTY("Your cart is empty, Please add products!"),
     CATEGORY_NOT_FOUND("Provided category not found. Please wait admin to add category"),
-    EMPTY_CATEGORY("No products found in the given category");
+    EMPTY_CATEGORY("No products found in the given category"),
+    EMAIL_SUCCESS("email sent succesfully");
 
 
     private String Message;

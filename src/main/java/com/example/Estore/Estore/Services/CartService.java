@@ -1,6 +1,7 @@
 package com.example.Estore.Estore.Services;
 
 import com.example.Estore.Estore.Exception.ClientSideException;
+import com.example.Estore.Estore.Services.ServiceImpl.EmailBuilder;
 import com.example.Estore.Estore.Ui.Model.Response.CartRequest.CartCost;
 import com.example.Estore.Estore.Shared.dto.User.UserDto;
 import com.example.Estore.Estore.Ui.Model.Response.CartRequest.CartItemRest;
@@ -33,6 +34,8 @@ public class CartService {
     CartItemRepository cartItemRepository;
     @Autowired
     WishListRepository wishListRepository;
+    @Autowired
+    EmailService emailService;
 
 
 //  Logic for adding products to Cart
@@ -114,7 +117,7 @@ public class CartService {
         CartItemEntity cartItemEntity = new CartItemEntity();
         ProductEntity productEntity = productRepository.findByProductId(productId);
 
-        if (cartItemRepository.findByUserEntityANDProductId(userEntity,productId)==null)
+        if (cartItemRepository.findByUserEntityANDProductId(userEntity, productId) == null)
             throw new ClientSideException(Messages.PRODUCT_DOES_NOT_EXIST.getMessage());
 
         cartItemRepository.deleteProduct(productId, userEntity);
@@ -248,4 +251,13 @@ public class CartService {
         return "Discount applied successfully";
 
     }
+
+//    public void abandonedCartMail(Long id) {
+//        UserEntity userEntity = new UserEntity();
+//        BeanUtils.copyProperties(id, userEntity);
+//        cartItemRepository.findByUserEntity(userEntity);
+//        EmailBuilder emailBuilder = new EmailBuilder();
+//        emailService.send(userEntity.getEmail(),emailBuilder.);
+//
+//    }
 }
