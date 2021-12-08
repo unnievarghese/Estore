@@ -18,7 +18,8 @@ public class SecurityConstants {
     public static final String USER_CREATE_EMAIL_LINK = "http://localhost:8080/estore/home/email/verify?token=";
     public static final String PASSWORD_EMAIL_LINK = "http://localhost:8080/estore/home/password/create?token=";
     public static final String RESEND_EMAIL_LINK = "/home/resend/verification";
-    public static final String USER_ACTIVATION_REQUEST_URL = "/home/user/activate/{userId}";
+    public static final String USER_ACTIVATION_BY_ADMIN_URL = "/home/user/activate/{userId}";
+    public static final String USER_ACTIVATION_BY_USER_URL = "/home/user/activate";
 
 
     public static String getTokenSecret(){

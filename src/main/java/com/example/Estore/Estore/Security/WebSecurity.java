@@ -53,7 +53,9 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         permitAll().
         antMatchers(HttpMethod.POST,SecurityConstants.RESEND_EMAIL_LINK).
         permitAll().
-        antMatchers(HttpMethod.POST,SecurityConstants.USER_ACTIVATION_REQUEST_URL).
+        antMatchers(HttpMethod.POST,SecurityConstants.USER_ACTIVATION_BY_ADMIN_URL).
+        permitAll().
+        antMatchers(HttpMethod.POST,SecurityConstants.USER_ACTIVATION_BY_USER_URL).
         permitAll().
         antMatchers("/v2/api-docs","/configuration/**","/swagger*/**","/webjars/**").
         permitAll().
