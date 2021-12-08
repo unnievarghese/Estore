@@ -1,12 +1,15 @@
 package com.example.Estore.Estore.io.Repositories.User;
 
 import com.example.Estore.Estore.io.Entity.User.UserEntity;
+import com.example.Estore.Estore.io.Entity.WishList.WishListEntity;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 /**
  * This interface is used to access the database.
@@ -60,6 +63,13 @@ public interface UserRepository extends PagingAndSortingRepository<UserEntity,Lo
     @Query(value = "DELETE FROM user_roles WHERE user_id = :id",nativeQuery = true)
     void deleteRole(@Param("id") UserEntity id);
 
+    @Modifying
+    @Query(value = "DELETE FROM wishlist WHERE user_reference_id = :id",nativeQuery = true)
+    void deleteWishList(@Param("id") UserEntity userEntity);
+
+    @Modifying
+    @Query(value = "DELETE FROM wishlist_product_entity_list WHERE wish_list_entity_wish_list_id = :id",nativeQuery = true)
+    void deleteWishListProductList(@Param("id") WishListEntity wishListEntity);
     /**
      * Method is used to delete user by database id.
      * @param id UserEntity
