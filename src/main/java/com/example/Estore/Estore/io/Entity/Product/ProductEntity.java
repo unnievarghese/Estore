@@ -31,6 +31,9 @@ public class ProductEntity implements Serializable {
     private LocalDateTime updatedTime;
     @CreationTimestamp
     private LocalDateTime createTime;
+    public ProductEntity() {
+    }
+
 
     public CategoryEntity getCategoryDetails() {
         return categoryDetails;
