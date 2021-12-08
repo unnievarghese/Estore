@@ -34,7 +34,7 @@ public class EmailServiceimpl implements EmailService {
      */
     @Override
     @Async
-    public void send(String to, String email) {
+    public boolean send(String to, String email) {
         try{
             MimeMessage mimeMessage =  mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage,"utf-8");
@@ -43,6 +43,7 @@ public class EmailServiceimpl implements EmailService {
             helper.setSubject("Estore Message");
             helper.setFrom("mctraining1993@gmail.com");
             mailSender.send(mimeMessage);
+            return true;
         }
         catch (MessagingException e){
             LOGGER.error("failed to send email", e);
