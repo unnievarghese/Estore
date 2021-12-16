@@ -1,7 +1,7 @@
 package com.example.Estore.Estore.Services;
 
 import com.example.Estore.Estore.Exception.ClientSideException;
-import com.example.Estore.Estore.Services.ServiceImpl.EmailBuilder;
+import com.example.Estore.Estore.Services.ServiceImpl.CartEmailBuilder;
 import com.example.Estore.Estore.Ui.Model.Response.CartRequest.CartCost;
 import com.example.Estore.Estore.Shared.dto.User.UserDto;
 import com.example.Estore.Estore.Ui.Model.Response.CartRequest.CartItemRest;
@@ -14,11 +14,15 @@ import com.example.Estore.Estore.io.Repositories.Cart.CartItemRepository;
 import com.example.Estore.Estore.io.Repositories.Product.ProductRepository;
 import com.example.Estore.Estore.io.Repositories.User.UserRepository;
 import com.example.Estore.Estore.io.Repositories.WishList.WishListRepository;
+import javassist.bytecode.stackmap.BasicBlock;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,19 +30,40 @@ import java.util.List;
 
 @Service
 public class CartService {
+    /**
+     * Inject UserRepository dependency
+     */
     @Autowired
     UserRepository userRepository;
+    /**
+     * Inject ProductRepository dependency
+     */
     @Autowired
     ProductRepository productRepository;
+    /**
+     * Inject CartItemRepository dependency
+     */
     @Autowired
     CartItemRepository cartItemRepository;
+    /**
+     * Inject WishListRepository dependency
+     */
     @Autowired
     WishListRepository wishListRepository;
+    /**
+     * Inject EmailService dependency
+     */
     @Autowired
     EmailService emailService;
 
 
-//  Logic for adding products to Cart
+    /**
+     * Logic for adding products to cart
+     * @param userId    unique id of user
+     * @param productId unique id of product
+     * @param quantity  count of products that we wanted to buy
+     * @return cartItemEntity
+     */
 
     public CartItemEntity addCartItem(String userId, Long productId, Integer quantity) {
         UserEntity userEntity = userRepository.findByUserId(userId);
@@ -59,17 +84,18 @@ public class CartService {
                 cartItemEntity.setTotalPrice(cartItemEntity.getTotalPrice() +
                         ((productEntity.getPrice() * (discount * 0.01)) * quantity));
                 cartItemRepository.save(cartItemEntity);
+
                 return cartItemEntity;
             }
             cartItemEntity.setTotalPrice(cartItemEntity.getTotalPrice() + (productEntity.getPrice() * quantity));
+            productEntity.setQuantity(productEntity.getQuantity() - quantity);
+            productRepository.save(productEntity);
             cartItemRepository.save(cartItemEntity);
             return cartItemEntity;
         }
 
         CartItemEntity newcartItemEntity = new CartItemEntity();
         newcartItemEntity.setProductEntity(productEntity);
-        newcartItemEntity.setCreatedDate(new Date());
-
         newcartItemEntity.setProductName(productEntity.getProductName());
         newcartItemEntity.setUserEntity(userEntity);
         newcartItemEntity.setQuantity(quantity);
@@ -80,7 +106,11 @@ public class CartService {
         return newcartItemEntity;
     }
 
-//  Logic for fetching all cartItems
+    /**
+     * Logic for fetching all cartItems
+     * @param user takes authentication of currently logged-in user
+     * @return CartCost class which has list of CartItemEntity and total cost and discounts if any.
+     */
 
     public CartCost findByUserId(UserDto user) {
         UserEntity userEntity = new UserEntity();
@@ -102,14 +132,18 @@ public class CartService {
             cartCost.setDiscount(Integer.toString(discount) + "% off ");
         }
         if (discount == 0) {
-            cartCost.setDiscount("no discounts applicable");
+            cartCost.setDiscount("no discounts applied");
         }
 
         return cartCost;
 
     }
 
-//  Logic for removing a product from cart
+    /**
+     * Logic for removing a product from cart
+     * @param user      takes authentication of currently logged-in user
+     * @param productId unique id of product which needs to be removed
+     */
 
     public void removeProductFromCart(UserDto user, Long productId) {
         UserEntity userEntity = new UserEntity();
@@ -119,13 +153,21 @@ public class CartService {
 
         if (cartItemRepository.findByUserEntityANDProductId(userEntity, productId) == null)
             throw new ClientSideException(Messages.PRODUCT_DOES_NOT_EXIST.getMessage());
-
+        CartItemEntity cartItem = cartItemRepository.findByUserEntityANDProductId(userEntity, productId);
+        int quantity = cartItem.getQuantity();
         cartItemRepository.deleteProduct(productId, userEntity);
-
+        productEntity.setQuantity(productEntity.getQuantity() + quantity);
+        productRepository.save(productEntity);
 
     }
 
-//  Logic for adding quantity of product
+    /**
+     * Logic for adding quantity of product
+     * @param user      takes authentication of currently logged-in user
+     * @param productId unique id of product which needs to be increased
+     * @param quantity  amount that needs to be added
+     * @return CartItemRest
+     */
 
     public CartItemRest addQuantity(UserDto user, Long productId, Integer quantity) {
         ProductEntity productEntity = productRepository.findByProductId(productId);
@@ -141,6 +183,7 @@ public class CartService {
             cartItemEntity.setTotalPrice(cartItemEntity.getTotalPrice() +
                     ((productEntity.getPrice() * (discount * 0.01)) * quantity));
             cartItemEntity.setQuantity(cartItemEntity.getQuantity() + quantity);
+            productEntity.setQuantity(productEntity.getQuantity() - quantity);
             cartItemRepository.save(cartItemEntity);
             CartItemRest cartItemRest = new ModelMapper().map(cartItemEntity, CartItemRest.class);
 
@@ -156,9 +199,16 @@ public class CartService {
         return cartItemRest;
 
     }
-//  Logic for reducing quantity of product
 
-    public CartItemRest reduceQuantity(UserDto user, Long productId, Integer quantity) {
+    /**
+     * Logic for reducing quantity of product
+     * @param user      takes authentication of currently logged-in user
+     * @param productId unique id of product which needs to be decreased
+     * @param quantity  amount that needs to be decreased
+     * @return CartItemRest
+     */
+
+    public CartItemRest reduceQuantity(UserDto user, Long productId, Integer quantity) throws ClientSideException {
         ProductEntity productEntity = productRepository.findByProductId(productId);
 
         UserEntity userEntity = new UserEntity();
@@ -173,7 +223,13 @@ public class CartService {
             cartItemEntity.setTotalPrice(cartItemEntity.getTotalPrice() -
                     ((productEntity.getPrice() * (discount * 0.01)) * quantity));
             cartItemEntity.setQuantity(cartItemEntity.getQuantity() - quantity);
+            productEntity.setQuantity(productEntity.getQuantity() + quantity);
+            productRepository.save(productEntity);
+            if (cartItemEntity.getQuantity() <= 0)
+
+                cartItemRepository.deleteProduct(productId, userEntity);
             cartItemRepository.save(cartItemEntity);
+
             CartItemRest cartItemRest = new ModelMapper().map(cartItemEntity, CartItemRest.class);
 
             return cartItemRest;
@@ -181,15 +237,25 @@ public class CartService {
         cartItemEntity.setQuantity(cartItemEntity.getQuantity() - quantity);
         cartItemEntity.setTotalPrice(cartItemEntity.getTotalPrice() - (productEntity.getPrice() * quantity));
         productEntity.setQuantity(productEntity.getQuantity() + quantity);
+        if (cartItemEntity.getQuantity() <= 0)
+            cartItemRepository.deleteProduct(productId, userEntity);
         productRepository.save(productEntity);
         cartItemRepository.save(cartItemEntity);
+
+
         CartItemRest cartItemRest = new ModelMapper().map(cartItemEntity, CartItemRest.class);
 
         return cartItemRest;
 
     }
 
-//  Logic for adding wishlist to cart
+    /**
+     * Logic for adding wishlist to cart
+     * @param user       takes authentication of currently logged-in user
+     * @param wishListId unique id of wishlist which needs to be added to cart
+     * @param quantity   count of products
+     * @return String
+     */
 
     public String addWishlistToCart(UserDto user, Long wishListId, Integer quantity) {
         WishListEntity wishListEntity = wishListRepository.findAllByWishListId(wishListId);
@@ -205,21 +271,26 @@ public class CartService {
 
             CartItemEntity cartItemEntity = new CartItemEntity();
             cartItemEntity.setProductEntity(productEntity);
-            cartItemEntity.setCreatedDate(new Date());
             cartItemEntity.setProductName(productEntity.getProductName());
             cartItemEntity.setUserEntity(userEntity);
             cartItemEntity.setQuantity(quantity);
             cartItemEntity.setTotalPrice(productEntity.getPrice() * quantity);
             productEntity.setQuantity(productEntity.getQuantity() - quantity);
+            productRepository.save(productEntity);
             cartItemRepository.save(cartItemEntity);
             wishListRepository.delete(wishListEntity);
         }
         return "WishList added successfully";
     }
 
-//  Logic for fetching particular product from cart
+    /**
+     * Logic for fetching particular product from cart
+     * @param user      takes authentication of currently logged-in user
+     * @param productId unique id of product
+     * @return CartCost
+     */
 
-    public CartCost findByProductId(UserDto user, Long productId) {
+    public CartItemRest findByProductId(UserDto user, Long productId) {
         UserEntity userEntity = new UserEntity();
         BeanUtils.copyProperties(user, userEntity);
         CartItemEntity cartItemEntity = cartItemRepository.findByUserEntityANDProductId(userEntity, productId);
@@ -227,16 +298,22 @@ public class CartService {
         if (cartItemRepository.findByUserEntityANDProductId(userEntity, productId) == null)
             throw new ClientSideException(Messages.PRODUCT_DOES_NOT_EXIST.getMessage());
 
-        CartCost cartCost = new ModelMapper().map(cartItemEntity, CartCost.class);
-        return cartCost;
+        CartItemRest cartItemRest = new ModelMapper().map(cartItemEntity, CartItemRest.class);
+        return cartItemRest;
 
     }
-//  Logic for adding discount to cartItems in case of any disputes in previous orders
+
+    /**
+     * Logic for adding discount to cartItems in case of any disputes in previous orders
+     * @param user     takes authentication of currently logged-in user
+     * @param discount amount that needs to be decreased from total price
+     * @return String
+     */
 
     public String applyPromoCode(UserDto user, int discount) {
         UserEntity userEntity = new UserEntity();
         BeanUtils.copyProperties(user, userEntity);
-        List<CartItemEntity> cartItemEntity = cartItemRepository.findByUserEntity(userEntity);
+        List<CartItemEntity> cartItemEntity = cartItemRepository.findByCartStatus(userEntity);
 
         for (CartItemEntity cartItem : cartItemEntity) {
 
@@ -252,12 +329,24 @@ public class CartService {
 
     }
 
-//    public void abandonedCartMail(Long id) {
-//        UserEntity userEntity = new UserEntity();
-//        BeanUtils.copyProperties(id, userEntity);
-//        cartItemRepository.findByUserEntity(userEntity);
-//        EmailBuilder emailBuilder = new EmailBuilder();
-//        emailService.send(userEntity.getEmail(),emailBuilder.);
-//
-//    }
+    /**
+     * Logic for sending email to user by admin in case of abandoned cart for a long time
+     * (50 minutes is taken here which can be changed accordingly)
+     */
+    public void abandonedCartMail() {
+        List<CartItemEntity> cartItemEntityList = cartItemRepository.findByStatus();
+        for (CartItemEntity cartItem : cartItemEntityList) {
+            long timeElapsed = (Duration.between(cartItem.getCreatedDate(), LocalDateTime.now()).get(ChronoUnit.SECONDS) / 60);
+            UserEntity userEntity = cartItem.getUserEntity();
+            if (timeElapsed >= 50) {
+
+                CartEmailBuilder emailBuilder = new CartEmailBuilder();
+                emailService.send(userEntity.getEmail(), emailBuilder.
+                        buildAbandondedCartContent(userEntity.getFirstName(), cartItem.getProductName(),
+                                cartItem.getQuantity(), cartItem.getTotalPrice()));
+            }
+        }
+    }
+
 }
+

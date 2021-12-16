@@ -34,7 +34,6 @@ public class CartController {
 
     /**
      * Method for adding products and quantity to cart of login user
-     *
      * @param productId unique id of product
      * @param quantity  count of products needed to be added to cart
      * @return CartItemRest Added item ,quantity, price,created date
@@ -66,8 +65,7 @@ public class CartController {
 
     /**
      * Method for fetching all the items in a cart of Login user
-     *
-     * @return CartCost All the items in cart along with total cost
+     * @return CartCost All the items in cart along with total cost and discount if any
      */
 
 //  http://localhost:8080/Estore/cart/fetch
@@ -89,7 +87,6 @@ public class CartController {
 
     /**
      * Method for deleting particular product from Cart of login user
-     *
      * @param productId unique id of product
      * @return OperationStatusModel whether the operation is success or not
      * @throws ClientSideException throws custom Exception
@@ -120,7 +117,6 @@ public class CartController {
 
     /**
      * Method for adding quantity of active product inside cart of login user
-     *
      * @param productId unique id of product
      * @param quantity  count of product that needs to be increased
      * @return CartItemRest
@@ -151,7 +147,6 @@ public class CartController {
 
     /**
      * Method for reducing quantity of active product inside cart of login user
-     *
      * @param productId unique id of product
      * @param quantity  count of products that needs to be reduced
      * @return CartItemRest
@@ -181,7 +176,6 @@ public class CartController {
 
     /**
      * Method for adding wishlist to cart
-     *
      * @param wishlistid unique id of wishlist
      * @param quantity   count of products that needs to be added to cart
      * @return String message whether wishlist is added to cart or not
@@ -195,7 +189,7 @@ public class CartController {
 
     @PostMapping(path = "/addWishlist/{wishlistid}")
     public String addWishlistToCart(@PathVariable(value = "wishlistid") long wishlistid,
-                                    @RequestParam(value = "quantity", defaultValue = "0") Integer quantity) {
+                                    @RequestParam(value = "quantity", defaultValue = "0") Integer quantity){
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
@@ -207,7 +201,6 @@ public class CartController {
 
     /**
      * Method for fetching a particular product from cart
-     *
      * @param productId unique id of product
      * @return CartItemRest
      */
@@ -220,18 +213,17 @@ public class CartController {
     })
 
     @GetMapping(path = "/fetch/{productId}")
-    public CartCost getCartByProductId(@PathVariable(value = "productId") Long productId) {
+    public CartItemRest getCartByProductId(@PathVariable(value = "productId") Long productId) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
 
-        CartCost cartCost = cartService.findByProductId(user, productId);
-        return cartCost;
+        CartItemRest cartItemRest = cartService.findByProductId(user, productId);
+        return cartItemRest;
     }
 
     /**
      * Method for adding discount for a particular user by the seller in case of any disputes in previous orders
-     *
      * @param discount integer value of discount that needs to be applied
      * @return String Discount applied successfully
      */
@@ -250,20 +242,24 @@ public class CartController {
         return cartService.applyPromoCode(user, discount);
     }
 
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "authorization",
-//                    value = "${userController.authorizationHeader.description}",
-//                    paramType = "header")
-//    })
-//    @Secured("ROLE_ADMIN")
-//    @PostMapping(path = "/email")
-//    public ResponseEntity<String> sendMail(@PathVariable(value = "user_id") Long id) {
-//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//        UserDto user = userService.getUser(auth.getName());
-//        cartService.abandonedCartMail(id);
-//        return new ResponseEntity<String>(Messages.EMAIL_SUCCESS.getMessage(), HttpStatus.OK);
-//
-//    }
+    /**
+     * Method for sending a cart remainder by admin for proceeding it to check out when cart is abandoned
+     * @return String email sent successfully
+     */
+//  http://localhost:8080/Estore/cart/checkIdleCart
+
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
+    @Secured("ROLE_ADMIN")
+    @PostMapping(path = "/checkIdleCart")
+    public ResponseEntity<String> sendCartRemainder() {
+        cartService.abandonedCartMail();
+        return new ResponseEntity<String>(Messages.EMAIL_SUCCESS.getMessage(), HttpStatus.OK);
+
+    }
 
 }
 

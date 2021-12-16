@@ -3,10 +3,10 @@ package com.example.Estore.Estore.io.Entity.Cart;
 import com.example.Estore.Estore.io.Entity.Product.ProductEntity;
 import com.example.Estore.Estore.io.Entity.User.UserEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Table(name = "cartitem")
@@ -25,7 +25,8 @@ public class CartItemEntity {
     @JoinColumn(name = "user_id")
     private UserEntity userEntity;
     private String productName;
-    private Date createdDate;
+    @CreationTimestamp
+    private LocalDateTime createdDate;
     @UpdateTimestamp
     private LocalDateTime updateTime;
 
@@ -59,11 +60,11 @@ public class CartItemEntity {
         this.updateTime = updateTime;
     }
 
-    public Date getCreatedDate() {
+    public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Date createdDate) {
+    public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
 
