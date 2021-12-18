@@ -47,7 +47,7 @@ public enum Messages {
     PRODUCT_DOES_NOT_EXIST("Product with given id does not exist,Please verify the id again"),
     EMPTY_RECORD("the record is empty"),
     PRODUCT_ALREADY_EXISTS("product already exits."),
-    PRODUCT_ADDED_WISHLIST("Product added to wishlist"),
+    PRODUCT_ADDED_TO_WISHLIST("Product added to wishlist"),
     DELETE_PRODUCT("product deleted successfully"),
     DELETE_REVIEW("review deleted successfully"),
     REVIEW_NOT_FOUND("no review found for this productid"),

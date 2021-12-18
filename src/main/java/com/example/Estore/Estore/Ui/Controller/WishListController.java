@@ -53,7 +53,7 @@ public class WishListController {
                 throw new ClientSideException(Messages.PRODUCT_DOES_NOT_EXIST.getMessage());
             }
             WishListEntity wishlistEntity = wishListService.addProductToWishList(user, productId);
-            return Messages.PRODUCT_ADDED_WISHLIST.getMessage();
+            return Messages.PRODUCT_ADDED_TO_WISHLIST.getMessage();
         }
     }
 
