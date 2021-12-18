@@ -57,7 +57,7 @@ public class ReviewController {
             throw new ClientSideException(Messages.PRODUCT_DOES_NOT_EXIST.getMessage());
         }
         else
-        return new ResponseEntity(reviewService.createReviewByUserId(reviewRequestModel,user), HttpStatus.CREATED);
+            return new ResponseEntity(reviewService.createReviewByUserId(reviewRequestModel,user), HttpStatus.CREATED);
     }
 
     /**
@@ -75,12 +75,14 @@ public class ReviewController {
     public ResponseEntity<ReviewRest> updateReview(@RequestBody ReviewRequestModel reviewRequestModel){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
-        if (reviewRepository.findById(reviewRequestModel.getProductId()).isEmpty())
+
+        if (reviewRepository.findByProductId(reviewRequestModel.getProductId()).isEmpty())
         {
-            throw new ClientSideException(Messages.PRODUCT_DOES_NOT_EXIST.getMessage());
+            throw new ClientSideException(Messages.NO_RECORD_FOUND.getMessage());
         }
         else
-        return new ResponseEntity(reviewService.updateReview(reviewRequestModel,user),HttpStatus.OK);
+
+            return new ResponseEntity(reviewService.updateReview(reviewRequestModel,user),HttpStatus.OK);
 
 
     }
@@ -105,7 +107,7 @@ public class ReviewController {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             UserDto user = userService.getUser(auth.getName());
             ReviewEntity reviewEntity = reviewService.deleteReviewByUser(user, ProductId);
-             return Messages.DELETE_REVIEW.getMessage();
+            return Messages.DELETE_REVIEW.getMessage();
         }
     }
 

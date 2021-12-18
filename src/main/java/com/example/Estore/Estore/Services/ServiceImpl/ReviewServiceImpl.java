@@ -50,7 +50,6 @@ public class ReviewServiceImpl {
             throw new ClientSideException(Messages.INVALID_INPUT.getMessage());
         }
         else if (optionalReviewEntity.isEmpty() ){
-
             reviewEntity.setProductEntity(reviewEntity.getProductEntity());
             reviewEntity.setUserEntity(reviewEntity.getUserEntity());
             reviewEntity.setRating(reviewEntity.getRating());
@@ -65,7 +64,7 @@ public class ReviewServiceImpl {
             return reviewRest;
         }
         else {
-            throw new ClientSideException(Messages.PRODUCT_ALREADY_EXISTS.getMessage());
+            throw new ClientSideException(Messages.REVIEW_ALREADY_EXISTS.getMessage());
         }
     }
 
@@ -81,22 +80,23 @@ public class ReviewServiceImpl {
         BeanUtils.copyProperties(user, userEntity);
 
 
-        Optional<ReviewEntity> reviewEntity=reviewRepository.findByProductIdAndUserId(reviewRequestModel.getProductId(), userEntity.getId());
-        if (reviewRequestModel.getRating()>5)
-        {
-            throw new ClientSideException(Messages.INVALID_INPUT.getMessage());
-        }
+        Optional<ReviewEntity> reviewEntity = reviewRepository.findByProductIdAndUserId(reviewRequestModel.getProductId(), userEntity.getId());
+
+        if (reviewRequestModel.getRating() > 5) {
+                throw new ClientSideException(Messages.INVALID_INPUT.getMessage());
+            }
         else {
-            reviewEntity.get().setRating(reviewRequestModel.getRating());
-            reviewEntity.get().setReview(reviewRequestModel.getReview());
-            ReviewEntity updateReview = reviewRepository.save(reviewEntity.get());
-            ReviewRest reviewRest = new ReviewRest();
-            reviewRest.setUserName(reviewEntity.get().getUserEntity().getFirstName());
-            BeanUtils.copyProperties(updateReview, reviewRest);
-            return reviewRest;
+                reviewEntity.get().setRating(reviewRequestModel.getRating());
+                reviewEntity.get().setReview(reviewRequestModel.getReview());
+                ReviewEntity updateReview = reviewRepository.save(reviewEntity.get());
+                ReviewRest reviewRest = new ReviewRest();
+                reviewRest.setUserName(reviewEntity.get().getUserEntity().getFirstName());
+                BeanUtils.copyProperties(updateReview, reviewRest);
+                return reviewRest;
+            }
+
         }
 
-    }
 
     /**
      * Method to delete a review using userId and productId
@@ -109,7 +109,7 @@ public class ReviewServiceImpl {
         Optional<ReviewEntity> reviewEntity=reviewRepository.findAllByUserIdAndProductId(user.getId(),productId);
         if (reviewEntity.isEmpty())
         {
-            throw new ClientSideException(Messages.NO_RECORD_FOUND.getMessage());
+            throw new ClientSideException(Messages.REVIEW_NOT_FOUND.getMessage());
         }
         ReviewEntity reviewEntity1=reviewEntity.get();
 

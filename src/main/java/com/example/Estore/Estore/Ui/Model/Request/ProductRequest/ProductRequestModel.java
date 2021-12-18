@@ -1,5 +1,7 @@
 package com.example.Estore.Estore.Ui.Model.Request.ProductRequest;
 
+import javax.persistence.Column;
+
 public class ProductRequestModel {
 
     private String productName;
