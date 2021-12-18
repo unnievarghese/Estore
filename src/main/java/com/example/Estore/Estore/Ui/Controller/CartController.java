@@ -14,6 +14,7 @@ import com.example.Estore.Estore.io.Entity.Cart.CartItemEntity;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,7 +59,10 @@ public class CartController {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             UserDto user = userService.getUser(auth.getName());
             CartItemEntity cartItemEntity = cartService.addCartItem(user.getUserId(), productId, quantity);
-            return new ModelMapper().map(cartItemEntity, CartItemRest.class);
+            CartItemRest cartRest = new CartItemRest();
+            BeanUtils.copyProperties(cartItemEntity,cartRest);
+            cartRest.setProductId(productId);
+            return cartRest;
         }
     }
 
