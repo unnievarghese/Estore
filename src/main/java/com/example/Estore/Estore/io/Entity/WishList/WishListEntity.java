@@ -28,7 +28,7 @@ public class WishListEntity {
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(name = "wishlist_products",
             joinColumns = {
-                    @JoinColumn(name = "wishlist_id", referencedColumnName = "wishListId",
+                    @JoinColumn(name = "wish_list_id", referencedColumnName = "wishListId",
                             nullable = false, updatable = false)},
             inverseJoinColumns = {
                     @JoinColumn(name = "product_id", referencedColumnName = "productId",

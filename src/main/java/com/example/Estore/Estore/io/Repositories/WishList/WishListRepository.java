@@ -20,10 +20,20 @@ public interface WishListRepository extends CrudRepository<WishListEntity, Long>
     @Query(value = "DELETE FROM wishlist_products w WHERE w.wishlist_id=?1 AND w.product_id=?2",nativeQuery = true)
     void deleteProduct(Long wishListId, Long productId);
 
+    /**
+     * method to find wishlist details based on userEntity.
+     * @param userEntity
+     * @return
+     */
     WishListEntity findByUserEntity(UserEntity userEntity);
 
     Optional<WishListEntity> findAllByUserEntity(UserEntity userEntity);
 
+    /**
+     * method to find wishlist baseed on user's id.
+     * @param id
+     * @return
+     */
     @Query(value ="SELECT * FROM wishlist w WHERE w.user_reference_id=?1",nativeQuery = true)
     WishListEntity findByUserId(long id);
 }
