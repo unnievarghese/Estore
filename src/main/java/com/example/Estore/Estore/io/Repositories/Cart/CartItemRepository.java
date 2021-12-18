@@ -21,7 +21,6 @@ public interface CartItemRepository extends JpaRepository<CartItemEntity, Long> 
     List<CartItemEntity> findByUserEntity(UserEntity userEntity);
 
     @Transactional
-
     @Modifying
 
     /**
@@ -33,7 +32,7 @@ public interface CartItemRepository extends JpaRepository<CartItemEntity, Long> 
     /**
      * Query for finding product of respective users from repository which is only active
      * @param userEntity id of user
-     * @param productId id of product
+     * @param productId  id of product
      * @return CartItemEntity
      */
 
@@ -60,7 +59,7 @@ public interface CartItemRepository extends JpaRepository<CartItemEntity, Long> 
      * Query for finding all active carts
      * @return CartItemEntity
      */
-    @Query(value = "SELECT * FROM cartitem pi where pi.cart_is_active=true",nativeQuery = true)
-    List<CartItemEntity>findByStatus();
+    @Query(value = "SELECT * FROM cartitem pi where pi.cart_is_active=true", nativeQuery = true)
+    List<CartItemEntity> findByStatus();
 
 }

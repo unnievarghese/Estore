@@ -175,12 +175,12 @@ public class CartController {
     }
 
     /**
-     * Method for adding wishlist to cart
-     * @param wishlistid unique id of wishlist
+     * Method for adding wishlistItems to cart
+     * @param productId unique id of product
      * @param quantity   count of products that needs to be added to cart
      * @return String message whether wishlist is added to cart or not
      */
-//  http://localhost:8080/Estore/cart/addWishlist/{wishlistid}?quantity={count}
+//  http://localhost:8080/Estore/cart/addWishlist/{productId}?quantity={count}
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authorization",
                     value = "${userController.authorizationHeader.description}",
@@ -189,12 +189,12 @@ public class CartController {
 
     @PostMapping(path = "/addWishlist/{productId}")
     public String addWishlistToCart(@PathVariable(value = "productId") Long productId,
-                                    @RequestParam(value = "quantity", defaultValue = "0") Integer quantity){
+                                    @RequestParam(value = "quantity", defaultValue = "0") Integer quantity) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
 
-        String wishListRest = cartService.addWishlistToCart(user,quantity,productId);
+        String wishListRest = cartService.addWishlistToCart(user, quantity, productId);
         return wishListRest;
 
     }
@@ -247,7 +247,6 @@ public class CartController {
      * @return String email sent successfully
      */
 //  http://localhost:8080/Estore/cart/checkIdleCart
-
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authorization",
                     value = "${userController.authorizationHeader.description}",
