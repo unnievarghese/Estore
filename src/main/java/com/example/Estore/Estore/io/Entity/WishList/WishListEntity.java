@@ -4,7 +4,6 @@ import com.example.Estore.Estore.io.Entity.Product.ProductEntity;
 import com.example.Estore.Estore.io.Entity.User.UserEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -17,11 +16,7 @@ import java.util.List;
 public class WishListEntity {
     @Id
     @GeneratedValue
-
     private long wishListId;
-
-
-
     @ManyToOne(cascade = CascadeType.ALL)
 
     @JsonIgnore
@@ -29,21 +24,20 @@ public class WishListEntity {
     private ProductEntity productEntity;
     @CreationTimestamp
     private LocalDateTime createdTime;
-    @UpdateTimestamp
-    private LocalDateTime updatedTime;
 
-
-
-    @ElementCollection
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinTable(name = "wishlist_products",
+            joinColumns = {
+                    @JoinColumn(name = "wishlist_id", referencedColumnName = "wishListId",
+                            nullable = false, updatable = false)},
+            inverseJoinColumns = {
+                    @JoinColumn(name = "product_id", referencedColumnName = "productId",
+                            nullable = false, updatable = false)})
     private List<ProductEntity> productEntityList=new ArrayList<ProductEntity>();
-    @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id",referencedColumnName = "userId")
     private UserEntity userEntity;
     private Long userReferenceId;
-
-
-
 
     public long getWishListId() {
         return wishListId;
@@ -52,15 +46,6 @@ public class WishListEntity {
     public void setWishListId(long wishListId) {
         this.wishListId = wishListId;
     }
-
-//    public ProductEntity getProductEntity() {
-//        return productEntity;
-//    }
-//
-//    public void setProductEntity(ProductEntity productEntity) {
-//        this.productEntity = productEntity;
-//    }
-   
 
     public UserEntity getUserEntity() {
         return userEntity;
@@ -94,7 +79,6 @@ public class WishListEntity {
         this.productEntity = productEntity;
     }
 }
-
 
 
 

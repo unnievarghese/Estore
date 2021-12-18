@@ -13,22 +13,17 @@ import java.util.Optional;
 @Repository
 public interface WishListRepository extends CrudRepository<WishListEntity, Long> {
 
-
-    Optional<WishListEntity> findAllByUserEntity(UserEntity userEntity);
-    WishListEntity findByUserEntity(UserEntity userEntity);
-
-    WishListEntity findByUserEntity(UserEntity userEntity);
-
     WishListEntity findAllByWishListId(Long wishListId);
-
 
     @Transactional
     @Modifying
-    @Query(value = "DELETE FROM wishlist_product_entity_list w WHERE w.wish_list_entity_wish_list_id=?1 AND w.product_entity_list_product_id=?2",nativeQuery = true)
+    @Query(value = "DELETE FROM wishlist_products w WHERE w.wishlist_id=?1 AND w.product_id=?2",nativeQuery = true)
     void deleteProduct(Long wishListId, Long productId);
 
+    WishListEntity findByUserEntity(UserEntity userEntity);
 
-    @Query(value="SELECT *  FROM wishlist_product_entity_list w WHERE w.wish_list_entity_wish_list_id=?1 AND w.product_entity_list_product_id=?2",nativeQuery = true)
-    Optional<WishListEntity> findByProductIdAndWWishlistId(Long wishListId, Long productId);
+    Optional<WishListEntity> findAllByUserEntity(UserEntity userEntity);
 
+    @Query(value ="SELECT * FROM wishlist w WHERE w.user_reference_id=?1",nativeQuery = true)
+    WishListEntity findByUserId(long id);
 }

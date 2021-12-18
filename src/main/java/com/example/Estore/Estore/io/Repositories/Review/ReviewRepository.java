@@ -42,4 +42,5 @@ public interface ReviewRepository extends CrudRepository<ReviewEntity,Long> {
     List<ReviewEntity> findReviewByUser(long id);
 
 
+
 }
