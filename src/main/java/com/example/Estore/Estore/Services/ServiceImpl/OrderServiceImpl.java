@@ -2,8 +2,12 @@ package com.example.Estore.Estore.Services.ServiceImpl;
 import com.example.Estore.Estore.Exception.ClientSideException;
 import com.example.Estore.Estore.Services.EmailService;
 import com.example.Estore.Estore.Ui.Model.Request.OrderRequest.OrderRequestModel;
+import com.example.Estore.Estore.Ui.Model.Response.CartRequest.CartItemRest;
 import com.example.Estore.Estore.Ui.Model.Response.Messages;
+import com.example.Estore.Estore.Ui.Model.Response.OrderResponse.OrderProcessModel;
 import com.example.Estore.Estore.Ui.Model.Response.OrderResponse.OrderResponseModel;
+import com.example.Estore.Estore.Ui.Model.Response.UserRequest.AddressesRest;
+import com.example.Estore.Estore.Ui.Model.Response.UserRequest.CardRest;
 import com.example.Estore.Estore.io.Entity.Cart.CartItemEntity;
 import com.example.Estore.Estore.io.Entity.Order.OrderEntity;
 import com.example.Estore.Estore.io.Entity.Product.ProductEntity;
@@ -14,6 +18,7 @@ import com.example.Estore.Estore.io.Repositories.Order.OrderRepository;
 import com.example.Estore.Estore.io.Repositories.Product.ProductRepository;
 import com.example.Estore.Estore.io.Repositories.User.UserRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
@@ -62,7 +67,7 @@ import java.util.List;
      * @return orderEntity
      * @throws Exception - EMPTY_CART - no products in cart
      */
-    public OrderEntity reviewOrder(String userId) throws Exception {
+    public OrderProcessModel reviewOrder(String userId) throws Exception {
 
 
         //finding user with userid
@@ -118,7 +123,27 @@ import java.util.List;
         LocalDate date = LocalDate.now();
         orderEntity.setDeliveryDate(date.plusDays(7));
 
-        return orderEntity;
+        OrderProcessModel orderProcessModel = new OrderProcessModel();
+        BeanUtils.copyProperties(orderEntity,orderProcessModel);
+        orderProcessModel.setDeliverydate(orderEntity.getDeliveryDate());
+        AddressesRest billingaddress = new AddressesRest();
+        BeanUtils.copyProperties(orderEntity.getBillingAddress(),billingaddress);
+        orderProcessModel.setBillingAddress(billingaddress);
+        AddressesRest shippingaddress = new AddressesRest();
+        BeanUtils.copyProperties(orderEntity.getShippingAddress(),shippingaddress);
+        orderProcessModel.setShippingAddress(shippingaddress);
+        CardRest cardDetails = new CardRest();
+        BeanUtils.copyProperties(orderEntity.getCardEntity(),cardDetails);
+        orderProcessModel.setCardEntity(cardDetails);
+        List<CartItemRest> cartItemRestList = new ArrayList<>();
+        for(CartItemEntity cartItem : orderEntity.getCartitemEntityList()){
+            CartItemRest cartItemRest = new CartItemRest();
+            BeanUtils.copyProperties(cartItem,cartItemRest);
+            cartItemRest.setProductId(cartItem.getProductEntity().getProductId());
+            cartItemRestList.add(cartItemRest);
+        }
+        orderProcessModel.setCartitemEntityList(cartItemRestList);
+        return orderProcessModel;
 
     }
 
@@ -132,7 +157,7 @@ import java.util.List;
      * @return orderEntity
      * @throws Exception - INVALID_PRODUCTID - no products in cart with the id
      */
-    public OrderEntity reviewOrder(String userId, Long productId) throws Exception {
+    public OrderProcessModel reviewOrder(String userId, Long productId) throws Exception {
 
 
         //finding user with userid
@@ -186,7 +211,27 @@ import java.util.List;
         LocalDate date = LocalDate.now();
         orderEntity.setDeliveryDate(date.plusDays(7));
 
-        return orderEntity;
+        OrderProcessModel orderProcessModel = new OrderProcessModel();
+        BeanUtils.copyProperties(orderEntity,orderProcessModel);
+        orderProcessModel.setDeliverydate(orderEntity.getDeliveryDate());
+        AddressesRest billingaddress = new AddressesRest();
+        BeanUtils.copyProperties(orderEntity.getBillingAddress(),billingaddress);
+        orderProcessModel.setBillingAddress(billingaddress);
+        AddressesRest shippingaddress = new AddressesRest();
+        BeanUtils.copyProperties(orderEntity.getShippingAddress(),shippingaddress);
+        orderProcessModel.setShippingAddress(shippingaddress);
+        CardRest cardDetails = new CardRest();
+        BeanUtils.copyProperties(orderEntity.getCardEntity(),cardDetails);
+        orderProcessModel.setCardEntity(cardDetails);
+        List<CartItemRest> cartItemRestList = new ArrayList<>();
+        for(CartItemEntity cartItem : orderEntity.getCartitemEntityList()){
+            CartItemRest cartItemRest = new CartItemRest();
+            BeanUtils.copyProperties(cartItem,cartItemRest);
+            cartItemRest.setProductId(cartItem.getProductEntity().getProductId());
+            cartItemRestList.add(cartItemRest);
+        }
+        orderProcessModel.setCartitemEntityList(cartItemRestList);
+        return orderProcessModel;
 
     }
 
@@ -200,7 +245,7 @@ import java.util.List;
      * @return orderEntity
      * @throws Exception - EMPTY_CART - no products in cart
      */
-        public OrderEntity createOrder(String userId) throws Exception {
+        public OrderResponseModel createOrder(String userId) throws Exception {
 
             //finding user with userid
             UserEntity userEntity = userRepository.findByUserId(userId);
@@ -253,8 +298,8 @@ import java.util.List;
 
             //setting user entity
             orderEntity.setUserEntity(userEntity);
-
-            orderEntity.setUserEntity1(userRepository.findByUserId("Cw4plwgIxr516rnVJ5MiGlQzbdSbaj"));
+            UserEntity seller = userRepository.findByUserId(cartItemEntity.get(0).getProductEntity().getSellerId());
+            orderEntity.setUserEntity1(seller);
 
             //setting card details
             if(userEntity.getCardDetails()==null)
@@ -288,7 +333,24 @@ import java.util.List;
             emailService.send(userEntity.getEmail(),orderemailbuilder.buildorderplacedcontent(userEntity.getFirstName(),id,status,orderamount,address,item,tamount,tax1,dc,localDate));
             emailService.send(orderEntity.getUserEntity1().getEmail(),orderemailbuilder.buildorderplacedcontent(orderEntity.getUserEntity1().getFirstName(),id,status,orderamount,address,item,tamount,tax1,dc,localDate));
 
-            return orderEntity;
+            OrderResponseModel orderResponseModel = new OrderResponseModel();
+            BeanUtils.copyProperties(orderEntity,orderResponseModel);
+            AddressesRest billingaddress = new AddressesRest();
+            BeanUtils.copyProperties(orderEntity.getBillingAddress(),billingaddress);
+            orderResponseModel.setBillingAddress(billingaddress);
+            AddressesRest shippingaddress = new AddressesRest();
+            BeanUtils.copyProperties(orderEntity.getShippingAddress(),shippingaddress);
+            orderResponseModel.setShippingAddress(shippingaddress);
+            List<CartItemRest> cartItemRestList = new ArrayList<>();
+            for(CartItemEntity cartItem : orderEntity.getCartitemEntityList()){
+                CartItemRest cartItemRest = new CartItemRest();
+                BeanUtils.copyProperties(cartItem,cartItemRest);
+                cartItemRest.setProductId(cartItem.getProductEntity().getProductId());
+                cartItemRestList.add(cartItemRest);
+            }
+            orderResponseModel.setCartitemEntityList(cartItemRestList);
+            orderResponseModel.setDeliverydate(orderEntity.getDeliveryDate());
+            return orderResponseModel;
 
         }
 
@@ -300,7 +362,7 @@ import java.util.List;
      * @return orderEntity
      * @throws Exception - INVALID_PRODUCTID - No products with productId
      */
-    public OrderEntity createOrderByProductId(Long productId,String userId) throws Exception {
+    public OrderResponseModel createOrderByProductId(Long productId,String userId) throws Exception {
 
         //finding user with userid
        UserEntity userEntity = userRepository.findByUserId(userId);
@@ -352,8 +414,8 @@ import java.util.List;
 
         //setting user entity
         orderEntity.setUserEntity(userEntity);
-
-        orderEntity.setUserEntity1(userRepository.findByUserId("Cw4plwgIxr516rnVJ5MiGlQzbdSbaj"));
+        UserEntity seller = userRepository.findByUserId(cartItemEntity.getProductEntity().getSellerId());
+        orderEntity.setUserEntity1(seller);
 
         //setting card details
         if(userEntity.getCardDetails()==null)
@@ -387,7 +449,24 @@ import java.util.List;
         emailService.send(userEntity.getEmail(),orderemailbuilder.buildorderplacedcontent(userEntity.getFirstName(),id,status,orderamount,address,item,tamount,tax1,dc,localDate));
         emailService.send(orderEntity.getUserEntity1().getEmail(),orderemailbuilder.buildorderplacedcontent(orderEntity.getUserEntity1().getFirstName(),id,status,orderamount,address,item,tamount,tax1,dc,localDate));
 
-        return orderEntity;
+        OrderResponseModel orderResponseModel = new OrderResponseModel();
+        BeanUtils.copyProperties(orderEntity,orderResponseModel);
+        AddressesRest billingaddress = new AddressesRest();
+        BeanUtils.copyProperties(orderEntity.getBillingAddress(),billingaddress);
+        orderResponseModel.setBillingAddress(billingaddress);
+        AddressesRest shippingaddress = new AddressesRest();
+        BeanUtils.copyProperties(orderEntity.getShippingAddress(),shippingaddress);
+        orderResponseModel.setShippingAddress(shippingaddress);
+        List<CartItemRest> cartItemRestList = new ArrayList<>();
+        for(CartItemEntity cartItem : orderEntity.getCartitemEntityList()){
+            CartItemRest cartItemRest = new CartItemRest();
+            BeanUtils.copyProperties(cartItem,cartItemRest);
+            cartItemRest.setProductId(cartItem.getProductEntity().getProductId());
+            cartItemRestList.add(cartItemRest);
+        }
+        orderResponseModel.setCartitemEntityList(cartItemRestList);
+        orderResponseModel.setDeliverydate(orderEntity.getDeliveryDate());
+        return orderResponseModel;
     }
 
 
@@ -408,7 +487,24 @@ import java.util.List;
 
         for (OrderEntity orderEntity:orderEntityList)
         {
-            returnValue.add(new ModelMapper().map(orderEntity,OrderResponseModel.class));
+            OrderResponseModel orderResponseModel = new OrderResponseModel();
+            BeanUtils.copyProperties(orderEntity,orderResponseModel);
+            AddressesRest billingaddress = new AddressesRest();
+            BeanUtils.copyProperties(orderEntity.getBillingAddress(),billingaddress);
+            orderResponseModel.setBillingAddress(billingaddress);
+            AddressesRest shippingaddress = new AddressesRest();
+            BeanUtils.copyProperties(orderEntity.getShippingAddress(),shippingaddress);
+            orderResponseModel.setShippingAddress(shippingaddress);
+            List<CartItemRest> cartItemRestList = new ArrayList<>();
+            for(CartItemEntity cartItem : orderEntity.getCartitemEntityList()){
+                CartItemRest cartItemRest = new CartItemRest();
+                BeanUtils.copyProperties(cartItem,cartItemRest);
+                cartItemRest.setProductId(cartItem.getProductEntity().getProductId());
+                cartItemRestList.add(cartItemRest);
+            }
+            orderResponseModel.setCartitemEntityList(cartItemRestList);
+            orderResponseModel.setDeliverydate(orderEntity.getDeliveryDate());
+            returnValue.add(orderResponseModel);
         }
         return  returnValue;
     }
@@ -422,14 +518,32 @@ import java.util.List;
      * @return orders
      * @throws Exception INVALID_ORDERID - No order wth given id
      */
-    public OrderEntity findByorderId(Long userId, Long id) throws Exception  {
+    public OrderResponseModel findByorderId(Long userId, Long id) throws Exception  {
 
 
         OrderEntity orderEntity=orderRepository.findByUserIdandOrderId(userId,id);
 
         if ((orderEntity==null))
             throw new ClientSideException(Messages.INVALID_ORDERID.getMessage());
-        return orderEntity;
+
+        OrderResponseModel orderResponseModel = new OrderResponseModel();
+        BeanUtils.copyProperties(orderEntity,orderResponseModel);
+        AddressesRest billingaddress = new AddressesRest();
+        BeanUtils.copyProperties(orderEntity.getBillingAddress(),billingaddress);
+        orderResponseModel.setBillingAddress(billingaddress);
+        AddressesRest shippingaddress = new AddressesRest();
+        BeanUtils.copyProperties(orderEntity.getShippingAddress(),shippingaddress);
+        orderResponseModel.setShippingAddress(shippingaddress);
+        List<CartItemRest> cartItemRestList = new ArrayList<>();
+        for(CartItemEntity cartItem : orderEntity.getCartitemEntityList()){
+            CartItemRest cartItemRest = new CartItemRest();
+            BeanUtils.copyProperties(cartItem,cartItemRest);
+            cartItemRest.setProductId(cartItem.getProductEntity().getProductId());
+            cartItemRestList.add(cartItemRest);
+        }
+        orderResponseModel.setCartitemEntityList(cartItemRestList);
+        orderResponseModel.setDeliverydate(orderEntity.getDeliveryDate());
+        return orderResponseModel;
 
 
     }
@@ -456,7 +570,24 @@ import java.util.List;
         List<OrderResponseModel>orders=new ArrayList<>();
         for (OrderEntity orderEntity:orderEntityList)
         {
-                orders.add(new ModelMapper().map(orderEntity,OrderResponseModel.class));
+            OrderResponseModel orderResponseModel = new OrderResponseModel();
+            BeanUtils.copyProperties(orderEntity,orderResponseModel);
+            AddressesRest billingaddress = new AddressesRest();
+            BeanUtils.copyProperties(orderEntity.getBillingAddress(),billingaddress);
+            orderResponseModel.setBillingAddress(billingaddress);
+            AddressesRest shippingaddress = new AddressesRest();
+            BeanUtils.copyProperties(orderEntity.getShippingAddress(),shippingaddress);
+            orderResponseModel.setShippingAddress(shippingaddress);
+            List<CartItemRest> cartItemRestList = new ArrayList<>();
+            for(CartItemEntity cartItem : orderEntity.getCartitemEntityList()){
+                CartItemRest cartItemRest = new CartItemRest();
+                BeanUtils.copyProperties(cartItem,cartItemRest);
+                cartItemRest.setProductId(cartItem.getProductEntity().getProductId());
+                cartItemRestList.add(cartItemRest);
+            }
+            orderResponseModel.setCartitemEntityList(cartItemRestList);
+            orderResponseModel.setDeliverydate(orderEntity.getDeliveryDate());
+            orders.add(orderResponseModel);
         }
         return  orders;
 
@@ -470,13 +601,30 @@ import java.util.List;
      * @return orders
      * @throws Exception INVALID_ORDERID - No order wth given id
      */
-    public OrderEntity getOrdersBySeller(Long sid,Long id) throws Exception {
+    public OrderResponseModel getOrdersBySeller(Long sid,Long id) throws Exception {
 
         OrderEntity orderEntity=orderRepository.findBySellerIdandOrderId(sid,id);
 
         if (orderEntity==null)
             throw new ClientSideException(Messages.INVALID_ORDERID.getMessage());
-        return orderEntity;
+        OrderResponseModel orderResponseModel = new OrderResponseModel();
+        BeanUtils.copyProperties(orderEntity,orderResponseModel);
+        AddressesRest billingaddress = new AddressesRest();
+        BeanUtils.copyProperties(orderEntity.getBillingAddress(),billingaddress);
+        orderResponseModel.setBillingAddress(billingaddress);
+        AddressesRest shippingaddress = new AddressesRest();
+        BeanUtils.copyProperties(orderEntity.getShippingAddress(),shippingaddress);
+        orderResponseModel.setShippingAddress(shippingaddress);
+        List<CartItemRest> cartItemRestList = new ArrayList<>();
+        for(CartItemEntity cartItem : orderEntity.getCartitemEntityList()){
+            CartItemRest cartItemRest = new CartItemRest();
+            BeanUtils.copyProperties(cartItem,cartItemRest);
+            cartItemRest.setProductId(cartItem.getProductEntity().getProductId());
+            cartItemRestList.add(cartItemRest);
+        }
+        orderResponseModel.setCartitemEntityList(cartItemRestList);
+        orderResponseModel.setDeliverydate(orderEntity.getDeliveryDate());
+        return orderResponseModel;
 
     }
 
@@ -491,7 +639,7 @@ import java.util.List;
      * @return orderEntity
      * @throws Exception INVALID_STATUS - not valid status  INVALID_ORDERID - No order with given Id   SAME_STATUS - already same status USER_CANCELLED - User cancelled the order
      */
-    public OrderEntity updateOrderStatus(Long userId, Long orderId, String status) throws Exception {
+    public OrderResponseModel updateOrderStatus(Long userId, Long orderId, String status) throws Exception {
 
             String status1=status.toLowerCase();
 
@@ -579,7 +727,24 @@ import java.util.List;
         UserEntity userEntity = orderRepository.findByorderId(orderId).getUserEntity();
         emailService.send(userEntity.getEmail(),orderemailbuilder.buildorderplacedcontent(userEntity.getFirstName(),id,status2,orderamount,address,item,tamount,tax1,dc,localDate));
 
-        return orderEntity;
+        OrderResponseModel orderResponseModel = new OrderResponseModel();
+        BeanUtils.copyProperties(orderEntity,orderResponseModel);
+        AddressesRest billingaddress = new AddressesRest();
+        BeanUtils.copyProperties(orderEntity.getBillingAddress(),billingaddress);
+        orderResponseModel.setBillingAddress(billingaddress);
+        AddressesRest shippingaddress = new AddressesRest();
+        BeanUtils.copyProperties(orderEntity.getShippingAddress(),shippingaddress);
+        orderResponseModel.setShippingAddress(shippingaddress);
+        List<CartItemRest> cartItemRestList = new ArrayList<>();
+        for(CartItemEntity cartItem : orderEntity.getCartitemEntityList()){
+            CartItemRest cartItemRest = new CartItemRest();
+            BeanUtils.copyProperties(cartItem,cartItemRest);
+            cartItemRest.setProductId(cartItem.getProductEntity().getProductId());
+            cartItemRestList.add(cartItemRest);
+        }
+        orderResponseModel.setCartitemEntityList(cartItemRestList);
+        orderResponseModel.setDeliverydate(orderEntity.getDeliveryDate());
+        return orderResponseModel;
     }
 
 
@@ -592,7 +757,7 @@ import java.util.List;
      * @return orderEntity
      * @throws Exception INVALID_ORDERID - No order with given orderId  ALREADY_CANCELLED - already cancelled order  CANCEL_REJECTED - Order no longer can be cancelled
      */
-    public OrderEntity removeOrder(String userId,Long orderId,OrderRequestModel orderRequestModel) throws Exception{
+    public OrderResponseModel removeOrder(String userId,Long orderId,OrderRequestModel orderRequestModel) throws Exception{
 
 
         UserEntity userEntity = userRepository.findByUserId(userId);
@@ -648,7 +813,24 @@ import java.util.List;
         }
         emailService.send(userEntity.getEmail(),orderemailbuilder.buildorderplacedcontent(userEntity.getFirstName(),id,status,orderamount,address,item,tamount,tax1,dc,localDate));
 
-        return orderEntity;
+        OrderResponseModel orderResponseModel = new OrderResponseModel();
+        BeanUtils.copyProperties(orderEntity,orderResponseModel);
+        AddressesRest billingaddress = new AddressesRest();
+        BeanUtils.copyProperties(orderEntity.getBillingAddress(),billingaddress);
+        orderResponseModel.setBillingAddress(billingaddress);
+        AddressesRest shippingaddress = new AddressesRest();
+        BeanUtils.copyProperties(orderEntity.getShippingAddress(),shippingaddress);
+        orderResponseModel.setShippingAddress(shippingaddress);
+        List<CartItemRest> cartItemRestList = new ArrayList<>();
+        for(CartItemEntity cartItem : orderEntity.getCartitemEntityList()){
+            CartItemRest cartItemRest = new CartItemRest();
+            BeanUtils.copyProperties(cartItem,cartItemRest);
+            cartItemRest.setProductId(cartItem.getProductEntity().getProductId());
+            cartItemRestList.add(cartItemRest);
+        }
+        orderResponseModel.setCartitemEntityList(cartItemRestList);
+        orderResponseModel.setDeliverydate(orderEntity.getDeliveryDate());
+        return orderResponseModel;
 
 
         }
@@ -662,7 +844,7 @@ import java.util.List;
      * @throws Exception INVALID_ORDERID - No order with given orderId NOT-DELIVERED - order not delivered yet ORDER_CANCELLED-order already cancelled
      */
 
-    public OrderEntity returnByOrderId(String userId, Long id, OrderRequestModel orderRequestModel) throws Exception  {
+    public OrderResponseModel returnByOrderId(String userId, Long id, OrderRequestModel orderRequestModel) throws Exception  {
 
         UserEntity userEntity=userRepository.findByUserId(userId);
         OrderEntity orderEntity=orderRepository.findByUserIdandOrderId(userEntity.getId(),id);
@@ -701,7 +883,24 @@ import java.util.List;
                 productRepository.save(productEntity);
             }
             orderRepository.save(orderEntity);
-            return orderEntity;
+            OrderResponseModel orderResponseModel = new OrderResponseModel();
+            BeanUtils.copyProperties(orderEntity,orderResponseModel);
+            AddressesRest billingaddress = new AddressesRest();
+            BeanUtils.copyProperties(orderEntity.getBillingAddress(),billingaddress);
+            orderResponseModel.setBillingAddress(billingaddress);
+            AddressesRest shippingaddress = new AddressesRest();
+            BeanUtils.copyProperties(orderEntity.getShippingAddress(),shippingaddress);
+            orderResponseModel.setShippingAddress(shippingaddress);
+            List<CartItemRest> cartItemRestList = new ArrayList<>();
+            for(CartItemEntity cartItem : orderEntity.getCartitemEntityList()){
+                CartItemRest cartItemRest = new CartItemRest();
+                BeanUtils.copyProperties(cartItem,cartItemRest);
+                cartItemRest.setProductId(cartItem.getProductEntity().getProductId());
+                cartItemRestList.add(cartItemRest);
+            }
+            orderResponseModel.setCartitemEntityList(cartItemRestList);
+            orderResponseModel.setDeliverydate(orderEntity.getDeliveryDate());
+            return orderResponseModel;
         }
 
 

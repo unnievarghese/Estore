@@ -123,7 +123,10 @@ public class CartService {
 
         double subTotal = 0;
         for (CartItemEntity cartItem : cartItemRepository.findByCartStatus(userEntity)) {
-            cartItemRestList.add(new ModelMapper().map(cartItem, CartItemRest.class));
+            CartItemRest cartRest = new CartItemRest();
+            BeanUtils.copyProperties(cartItem,cartRest);
+            cartRest.setProductId((cartItem.getProductEntity().getProductId()));
+            cartItemRestList.add(cartRest);
             subTotal += cartItem.getTotalPrice();
 
         }
@@ -189,18 +192,20 @@ public class CartService {
             cartItemEntity.setQuantity(cartItemEntity.getQuantity() + quantity);
             productEntity.setQuantity(productEntity.getQuantity() - quantity);
             cartItemRepository.save(cartItemEntity);
-            CartItemRest cartItemRest = new ModelMapper().map(cartItemEntity, CartItemRest.class);
-
-            return cartItemRest;
+            CartItemRest cartRest = new CartItemRest();
+            BeanUtils.copyProperties(cartItemEntity,cartRest);
+            cartRest.setProductId(productId);
+            return cartRest;
         }
         cartItemEntity.setQuantity(cartItemEntity.getQuantity() + quantity);
         cartItemEntity.setTotalPrice(cartItemEntity.getTotalPrice() + (productEntity.getPrice() * quantity));
         productEntity.setQuantity(productEntity.getQuantity() - quantity);
         productRepository.save(productEntity);
         cartItemRepository.save(cartItemEntity);
-        CartItemRest cartItemRest = new ModelMapper().map(cartItemEntity, CartItemRest.class);
-
-        return cartItemRest;
+        CartItemRest cartRest = new CartItemRest();
+        BeanUtils.copyProperties(cartItemEntity,cartRest);
+        cartRest.setProductId(productId);
+        return cartRest;
 
     }
 
@@ -233,10 +238,10 @@ public class CartService {
 
                 cartItemRepository.deleteProduct(productId, userEntity);
             cartItemRepository.save(cartItemEntity);
-
-            CartItemRest cartItemRest = new ModelMapper().map(cartItemEntity, CartItemRest.class);
-
-            return cartItemRest;
+            CartItemRest cartRest = new CartItemRest();
+            BeanUtils.copyProperties(cartItemEntity,cartRest);
+            cartRest.setProductId(productId);
+            return cartRest;
         }
         cartItemEntity.setQuantity(cartItemEntity.getQuantity() - quantity);
         cartItemEntity.setTotalPrice(cartItemEntity.getTotalPrice() - (productEntity.getPrice() * quantity));
@@ -245,12 +250,10 @@ public class CartService {
             cartItemRepository.deleteProduct(productId, userEntity);
         productRepository.save(productEntity);
         cartItemRepository.save(cartItemEntity);
-
-
-        CartItemRest cartItemRest = new ModelMapper().map(cartItemEntity, CartItemRest.class);
-
-        return cartItemRest;
-
+        CartItemRest cartRest = new CartItemRest();
+        BeanUtils.copyProperties(cartItemEntity,cartRest);
+        cartRest.setProductId(productId);
+        return cartRest;
     }
 
     /**
@@ -267,7 +270,7 @@ public class CartService {
         WishListEntity wishListEntity1 = wishListRepository.findByUserEntity(userEntity);
 
         List<ProductEntity> productEntityList = wishListEntity1.getProductEntityList();
-        if (wishListEntity1.getProductEntity()==null) throw new
+        if (wishListEntity1.getProductEntityList()==null) throw new
                 ClientSideException(Messages.PRODUCT_DOES_NOT_EXIST.getMessage());
 
         for (ProductEntity productEntity : productEntityList) {
@@ -302,9 +305,10 @@ public class CartService {
 
         if (cartItemRepository.findByUserEntityANDProductId(userEntity, productId) == null)
             throw new ClientSideException(Messages.PRODUCT_DOES_NOT_EXIST.getMessage());
-
-        CartItemRest cartItemRest = new ModelMapper().map(cartItemEntity, CartItemRest.class);
-        return cartItemRest;
+        CartItemRest cartRest = new CartItemRest();
+        BeanUtils.copyProperties(cartItemEntity,cartRest);
+        cartRest.setProductId(productId);
+        return cartRest;
 
     }
 
