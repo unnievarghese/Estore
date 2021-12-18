@@ -81,22 +81,23 @@ public class ReviewServiceImpl {
         BeanUtils.copyProperties(user, userEntity);
 
 
-        Optional<ReviewEntity> reviewEntity=reviewRepository.findByProductIdAndUserId(reviewRequestModel.getProductId(), userEntity.getId());
-        if (reviewRequestModel.getRating()>5)
-        {
-            throw new ClientSideException(Messages.INVALID_INPUT.getMessage());
-        }
+        Optional<ReviewEntity> reviewEntity = reviewRepository.findByProductIdAndUserId(reviewRequestModel.getProductId(), userEntity.getId());
+
+        if (reviewRequestModel.getRating() > 5) {
+                throw new ClientSideException(Messages.INVALID_INPUT.getMessage());
+            }
         else {
-            reviewEntity.get().setRating(reviewRequestModel.getRating());
-            reviewEntity.get().setReview(reviewRequestModel.getReview());
-            ReviewEntity updateReview = reviewRepository.save(reviewEntity.get());
-            ReviewRest reviewRest = new ReviewRest();
-            reviewRest.setUserName(reviewEntity.get().getUserEntity().getFirstName());
-            BeanUtils.copyProperties(updateReview, reviewRest);
-            return reviewRest;
+                reviewEntity.get().setRating(reviewRequestModel.getRating());
+                reviewEntity.get().setReview(reviewRequestModel.getReview());
+                ReviewEntity updateReview = reviewRepository.save(reviewEntity.get());
+                ReviewRest reviewRest = new ReviewRest();
+                reviewRest.setUserName(reviewEntity.get().getUserEntity().getFirstName());
+                BeanUtils.copyProperties(updateReview, reviewRest);
+                return reviewRest;
+            }
+
         }
 
-    }
 
     /**
      * Method to delete a review using userId and productId

@@ -216,7 +216,7 @@ public class CartService {
 
 //  Logic for fetching particular product from cart
 
-    public CartCost findByProductId(UserDto user, Long productId) {
+    public CartItemRest findByProductId(UserDto user, Long productId) {
         UserEntity userEntity = new UserEntity();
         BeanUtils.copyProperties(user, userEntity);
         CartItemEntity cartItemEntity = cartItemRepository.findByUserEntityANDProductId(userEntity, productId);
@@ -224,8 +224,8 @@ public class CartService {
         if (cartItemRepository.findByUserEntityANDProductId(userEntity, productId) == null)
             throw new ClientSideException(Messages.PRODUCT_DOES_NOT_EXIST.getMessage());
 
-        CartCost cartCost = new ModelMapper().map(cartItemEntity, CartCost.class);
-        return cartCost;
+        CartItemRest cartItemRest = new ModelMapper().map(cartItemEntity, CartItemRest.class);
+        return cartItemRest;
 
     }
 //  Logic for adding discount to cartItems in case of any disputes in previous orders
@@ -233,7 +233,7 @@ public class CartService {
     public String applyPromoCode(UserDto user, int discount) {
         UserEntity userEntity = new UserEntity();
         BeanUtils.copyProperties(user, userEntity);
-        List<CartItemEntity> cartItemEntity = cartItemRepository.findByUserEntity(userEntity);
+        List<CartItemEntity> cartItemEntity = cartItemRepository.findByCartStatus(userEntity);
 
         for (CartItemEntity cartItem : cartItemEntity) {
 

@@ -212,13 +212,13 @@ public class CartController {
     })
 
     @GetMapping(path = "/fetch/{productId}")
-    public CartCost getCartByProductId(@PathVariable(value = "productId") Long productId) {
+    public CartItemRest getCartByProductId(@PathVariable(value = "productId") Long productId) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
 
-        CartCost cartCost = cartService.findByProductId(user, productId);
-        return cartCost;
+        CartItemRest cartItemRest = cartService.findByProductId(user, productId);
+        return cartItemRest;
     }
 
     /**
