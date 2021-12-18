@@ -3,8 +3,8 @@ package com.example.Estore.Estore.Ui.Controller;
 import com.example.Estore.Estore.Exception.ClientSideException;
 import com.example.Estore.Estore.Services.CartService;
 import com.example.Estore.Estore.Services.UserService;
-import com.example.Estore.Estore.Ui.Model.Response.CartRequest.CartCost;
 import com.example.Estore.Estore.Shared.dto.User.UserDto;
+import com.example.Estore.Estore.Ui.Model.Response.CartRequest.CartCost;
 import com.example.Estore.Estore.Ui.Model.Response.CartRequest.CartItemRest;
 import com.example.Estore.Estore.Ui.Model.Response.Messages;
 import com.example.Estore.Estore.Ui.Model.Response.OperationStatusModel;
@@ -13,7 +13,7 @@ import com.example.Estore.Estore.Ui.Model.Response.RequestOperationStatus;
 import com.example.Estore.Estore.io.Entity.Cart.CartItemEntity;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
-import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,7 +58,10 @@ public class CartController {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             UserDto user = userService.getUser(auth.getName());
             CartItemEntity cartItemEntity = cartService.addCartItem(user.getUserId(), productId, quantity);
-            return new ModelMapper().map(cartItemEntity, CartItemRest.class);
+            CartItemRest cartRest = new CartItemRest();
+            BeanUtils.copyProperties(cartItemEntity,cartRest);
+            cartRest.setProductId(productId);
+            return cartRest;
         }
     }
 

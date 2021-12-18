@@ -7,16 +7,14 @@ import com.example.Estore.Estore.Shared.dto.User.UserDto;
 import com.example.Estore.Estore.Ui.Model.Request.OrderRequest.OrderRequestModel;
 import com.example.Estore.Estore.Ui.Model.Response.OrderResponse.OrderProcessModel;
 import com.example.Estore.Estore.Ui.Model.Response.OrderResponse.OrderResponseModel;
-import com.example.Estore.Estore.io.Entity.Order.OrderEntity;
-import com.example.Estore.Estore.io.Repositories.User.UserRepository;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -51,8 +49,8 @@ public class OrderController {
     public OrderProcessModel reviewOrder() throws Exception {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
-        OrderEntity orderEntity = orderService.reviewOrder(user.getUserId());
-        return new ModelMapper().map(orderEntity, OrderProcessModel.class);
+        OrderProcessModel orderEntity = orderService.reviewOrder(user.getUserId());
+        return orderEntity;
 
     }
 
@@ -76,8 +74,8 @@ public class OrderController {
     public OrderProcessModel reviewOrderByproduct(@PathVariable (value="productId")Long productId) throws Exception {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
-        OrderEntity orderEntity = orderService.reviewOrder(user.getUserId(),productId);
-        return new ModelMapper().map(orderEntity, OrderProcessModel.class);
+        OrderProcessModel orderEntity = orderService.reviewOrder(user.getUserId(),productId);
+        return orderEntity;
 
 
     }
@@ -100,8 +98,8 @@ public class OrderController {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
-        OrderEntity orderEntity = orderService.createOrder(user.getUserId());
-        return new ModelMapper().map(orderEntity,OrderResponseModel.class);
+        OrderResponseModel orderEntity = orderService.createOrder(user.getUserId());
+        return orderEntity;
     }
 
 
@@ -124,8 +122,8 @@ public class OrderController {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
-        OrderEntity orderEntity = orderService.createOrderByProductId(productId,user.getUserId());
-        return new ModelMapper().map(orderEntity,OrderResponseModel.class);
+        OrderResponseModel orderEntity = orderService.createOrderByProductId(productId,user.getUserId());
+        return orderEntity;
     }
 
 
@@ -171,8 +169,8 @@ public class OrderController {
     public OrderResponseModel getOrderByOrderId(@PathVariable (value="orderId") Long orderId) throws Exception {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
-        OrderEntity order=orderService.findByorderId(user.getId(),orderId);
-        return new ModelMapper().map(order,OrderResponseModel.class);
+        OrderResponseModel order=orderService.findByorderId(user.getId(),orderId);
+        return order;
     }
 
 
@@ -214,8 +212,8 @@ public class OrderController {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
-        OrderEntity order = orderService.getOrdersBySeller(user.getId(),orderId);
-        return new ModelMapper().map(order,OrderResponseModel.class);
+        OrderResponseModel order = orderService.getOrdersBySeller(user.getId(),orderId);
+        return order;
 
 
     }
@@ -241,8 +239,8 @@ public class OrderController {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
-        OrderEntity orderEntity=orderService.updateOrderStatus(user.getId(),orderId,status);
-        return new ModelMapper().map(orderEntity,OrderResponseModel.class);
+        OrderResponseModel orderEntity=orderService.updateOrderStatus(user.getId(),orderId,status);
+        return orderEntity;
 
 
     }
@@ -265,10 +263,10 @@ public class OrderController {
     public OrderResponseModel cancelByOrderId(@PathVariable(value = "orderId") Long orderId,@RequestBody OrderRequestModel orderRequestModel) throws Exception{
 
 
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            UserDto user = userService.getUser(auth.getName());
-            OrderEntity orderEntity=orderService.removeOrder(user.getUserId(), orderId,orderRequestModel);
-            return new ModelMapper().map(orderEntity,OrderResponseModel.class);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserDto user = userService.getUser(auth.getName());
+        OrderResponseModel orderEntity=orderService.removeOrder(user.getUserId(), orderId,orderRequestModel);
+        return orderEntity;
 
     }
 
@@ -289,32 +287,10 @@ public class OrderController {
     public OrderResponseModel returnByOrderId(@PathVariable (value="orderId") Long orderId, @RequestBody OrderRequestModel orderRequestModel) throws Exception {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
-        OrderEntity order=orderService.returnByOrderId(user.getUserId(),orderId,orderRequestModel);
-        return new ModelMapper().map(order,OrderResponseModel.class);
+        OrderResponseModel order=orderService.returnByOrderId(user.getUserId(),orderId,orderRequestModel);
+        return order;
     }
 
 
 
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}

@@ -2,8 +2,8 @@ package com.example.Estore.Estore.Services;
 
 import com.example.Estore.Estore.Exception.ClientSideException;
 import com.example.Estore.Estore.Services.ServiceImpl.CartEmailBuilder;
-import com.example.Estore.Estore.Ui.Model.Response.CartRequest.CartCost;
 import com.example.Estore.Estore.Shared.dto.User.UserDto;
+import com.example.Estore.Estore.Ui.Model.Response.CartRequest.CartCost;
 import com.example.Estore.Estore.Ui.Model.Response.CartRequest.CartItemRest;
 import com.example.Estore.Estore.Ui.Model.Response.Messages;
 import com.example.Estore.Estore.io.Entity.Cart.CartItemEntity;
@@ -14,8 +14,6 @@ import com.example.Estore.Estore.io.Repositories.Cart.CartItemRepository;
 import com.example.Estore.Estore.io.Repositories.Product.ProductRepository;
 import com.example.Estore.Estore.io.Repositories.User.UserRepository;
 import com.example.Estore.Estore.io.Repositories.WishList.WishListRepository;
-import javassist.bytecode.stackmap.BasicBlock;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,7 +22,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -123,9 +120,11 @@ public class CartService {
 
         double subTotal = 0;
         for (CartItemEntity cartItem : cartItemRepository.findByCartStatus(userEntity)) {
-            cartItemRestList.add(new ModelMapper().map(cartItem, CartItemRest.class));
+            CartItemRest cartRest = new CartItemRest();
+            BeanUtils.copyProperties(cartItem,cartRest);
+            cartRest.setProductId((cartItem.getProductEntity().getProductId()));
+            cartItemRestList.add(cartRest);
             subTotal += cartItem.getTotalPrice();
-
         }
         CartCost cartCost = new CartCost();
 
@@ -189,18 +188,20 @@ public class CartService {
             cartItemEntity.setQuantity(cartItemEntity.getQuantity() + quantity);
             productEntity.setQuantity(productEntity.getQuantity() - quantity);
             cartItemRepository.save(cartItemEntity);
-            CartItemRest cartItemRest = new ModelMapper().map(cartItemEntity, CartItemRest.class);
-
-            return cartItemRest;
+            CartItemRest cartRest = new CartItemRest();
+            BeanUtils.copyProperties(cartItemEntity,cartRest);
+            cartRest.setProductId(productId);
+            return cartRest;
         }
         cartItemEntity.setQuantity(cartItemEntity.getQuantity() + quantity);
         cartItemEntity.setTotalPrice(cartItemEntity.getTotalPrice() + (productEntity.getPrice() * quantity));
         productEntity.setQuantity(productEntity.getQuantity() - quantity);
         productRepository.save(productEntity);
         cartItemRepository.save(cartItemEntity);
-        CartItemRest cartItemRest = new ModelMapper().map(cartItemEntity, CartItemRest.class);
-
-        return cartItemRest;
+        CartItemRest cartRest = new CartItemRest();
+        BeanUtils.copyProperties(cartItemEntity,cartRest);
+        cartRest.setProductId(productId);
+        return cartRest;
 
     }
 
@@ -234,9 +235,10 @@ public class CartService {
                 cartItemRepository.deleteProduct(productId, userEntity);
             cartItemRepository.save(cartItemEntity);
 
-            CartItemRest cartItemRest = new ModelMapper().map(cartItemEntity, CartItemRest.class);
-
-            return cartItemRest;
+            CartItemRest cartRest = new CartItemRest();
+            BeanUtils.copyProperties(cartItemEntity,cartRest);
+            cartRest.setProductId(productId);
+            return cartRest;
         }
         cartItemEntity.setQuantity(cartItemEntity.getQuantity() - quantity);
         cartItemEntity.setTotalPrice(cartItemEntity.getTotalPrice() - (productEntity.getPrice() * quantity));
@@ -247,9 +249,10 @@ public class CartService {
         cartItemRepository.save(cartItemEntity);
 
 
-        CartItemRest cartItemRest = new ModelMapper().map(cartItemEntity, CartItemRest.class);
-
-        return cartItemRest;
+        CartItemRest cartRest = new CartItemRest();
+        BeanUtils.copyProperties(cartItemEntity,cartRest);
+        cartRest.setProductId(productId);
+        return cartRest;
 
     }
 
@@ -267,7 +270,7 @@ public class CartService {
         WishListEntity wishListEntity1 = wishListRepository.findByUserEntity(userEntity);
 
         List<ProductEntity> productEntityList = wishListEntity1.getProductEntityList();
-        if (wishListEntity1.getProductEntity()==null) throw new
+        if (wishListEntity1.getProductEntityList()==null) throw new
                 ClientSideException(Messages.PRODUCT_DOES_NOT_EXIST.getMessage());
 
         for (ProductEntity productEntity : productEntityList) {
@@ -302,9 +305,10 @@ public class CartService {
 
         if (cartItemRepository.findByUserEntityANDProductId(userEntity, productId) == null)
             throw new ClientSideException(Messages.PRODUCT_DOES_NOT_EXIST.getMessage());
-
-        CartItemRest cartItemRest = new ModelMapper().map(cartItemEntity, CartItemRest.class);
-        return cartItemRest;
+        CartItemRest cartRest = new CartItemRest();
+        BeanUtils.copyProperties(cartItemEntity,cartRest);
+        cartRest.setProductId(productId);
+        return cartRest;
 
     }
 
