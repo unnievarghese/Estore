@@ -528,7 +528,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserDetails loadUserByUsername(String email){
-        UserEntity userEntity = userRepository.findByEmail(email);;
+        UserEntity userEntity = userRepository.findByEmail(email);
         Collection<GrantedAuthority> authorities = new HashSet<>();
         Collection<AuthorityEntity> authorityEntity = new HashSet<>();
 
