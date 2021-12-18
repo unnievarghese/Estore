@@ -4,11 +4,19 @@ package com.example.Estore.Estore.Ui.Model.Response.CartRequest;
 import java.time.LocalDateTime;
 
 public class CartItemRest {
+    private Long productId;
     private String productName;
     private Integer quantity;
     private double totalPrice;
     private LocalDateTime createdDate;
 
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
 
     public LocalDateTime getCreatedDate() {
         return createdDate;

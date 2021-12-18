@@ -59,6 +59,7 @@ public class CartService {
 
     /**
      * Logic for adding products to cart
+     *
      * @param userId    unique id of user
      * @param productId unique id of product
      * @param quantity  count of products that we wanted to buy
@@ -108,6 +109,7 @@ public class CartService {
 
     /**
      * Logic for fetching all cartItems
+     *
      * @param user takes authentication of currently logged-in user
      * @return CartCost class which has list of CartItemEntity and total cost and discounts if any.
      */
@@ -119,14 +121,18 @@ public class CartService {
             throw new ClientSideException(Messages.CART_IS_EMPTY.getMessage());
 
         List<CartItemRest> cartItemRestList = new ArrayList<>();
-        double totalCost = 0;
+
+
+        double subTotal = 0;
         for (CartItemEntity cartItem : cartItemRepository.findByCartStatus(userEntity)) {
             cartItemRestList.add(new ModelMapper().map(cartItem, CartItemRest.class));
-            totalCost += cartItem.getTotalPrice();
+            subTotal += cartItem.getTotalPrice();
+
         }
         CartCost cartCost = new CartCost();
+
         cartCost.setCartItem(cartItemRestList);
-        cartCost.setTotalCost(totalCost);
+        cartCost.setSubTotal(subTotal);
         int discount = cartItemRepository.findByCartStatus(userEntity).get(0).getDiscount();
         if (discount != 0) {
             cartCost.setDiscount(Integer.toString(discount) + "% off ");
@@ -141,6 +147,7 @@ public class CartService {
 
     /**
      * Logic for removing a product from cart
+     *
      * @param user      takes authentication of currently logged-in user
      * @param productId unique id of product which needs to be removed
      */
@@ -163,6 +170,7 @@ public class CartService {
 
     /**
      * Logic for adding quantity of product
+     *
      * @param user      takes authentication of currently logged-in user
      * @param productId unique id of product which needs to be increased
      * @param quantity  amount that needs to be added
@@ -202,6 +210,7 @@ public class CartService {
 
     /**
      * Logic for reducing quantity of product
+     *
      * @param user      takes authentication of currently logged-in user
      * @param productId unique id of product which needs to be decreased
      * @param quantity  amount that needs to be decreased
@@ -251,40 +260,46 @@ public class CartService {
 
     /**
      * Logic for adding wishlist to cart
+     *
      * @param user       takes authentication of currently logged-in user
      * @param wishListId unique id of wishlist which needs to be added to cart
      * @param quantity   count of products
+     * @param productId
      * @return String
      */
 
-    public String addWishlistToCart(UserDto user, Long wishListId, Integer quantity) {
-        WishListEntity wishListEntity = wishListRepository.findAllByWishListId(wishListId);
-
-        if (wishListRepository.findById(wishListId).isEmpty())
-            throw new ClientSideException(Messages.NO_RECORD_FOUND.getMessage());
+    public String addWishlistToCart(UserDto user, Integer quantity, Long productId) {
+        UserEntity userEntity1=userRepository.findByUserId(user.getUserId());
+        WishListEntity wishListEntity1=wishListRepository.findByUserEntity(userEntity1);
+        Long wishlistId=wishListEntity1.getWishListId();
+     WishListEntity wishListEntity = wishListRepository.findByProductIdAndWishlistId(productId,wishlistId);
+        System.out.println(wishListEntity);
+//        if (wishListRepository.findById(wishListId).isEmpty())
+//            throw new ClientSideException(Messages.NO_RECORD_FOUND.getMessage());
 
         String UserId = user.getUserId();
         UserEntity userEntity = userRepository.findByUserId(UserId);
-        List<ProductEntity> productEntityList = wishListEntity.getProductEntityList();
+//        ProductEntity productEntity = wishListEntity.getProductEntity();
 
-        for (ProductEntity productEntity : productEntityList) {
+//        for (ProductEntity productEntity : productEntityList) {
+//            if (wishListEntity.getProductEntityList().get(productEntityList.size()).getProductId().equals(productId)) {
+//                CartItemEntity cartItemEntity = new CartItemEntity();
+//                cartItemEntity.setProductEntity(productEntity);
+//                cartItemEntity.setProductName(productEntity.getProductName());
+//                cartItemEntity.setUserEntity(userEntity);
+//                cartItemEntity.setQuantity(quantity);
+//                cartItemEntity.setTotalPrice(productEntity.getPrice() * quantity);
+//                productEntity.setQuantity(productEntity.getQuantity() - quantity);
+//                productRepository.save(productEntity);
+//                cartItemRepository.save(cartItemEntity);
 
-            CartItemEntity cartItemEntity = new CartItemEntity();
-            cartItemEntity.setProductEntity(productEntity);
-            cartItemEntity.setProductName(productEntity.getProductName());
-            cartItemEntity.setUserEntity(userEntity);
-            cartItemEntity.setQuantity(quantity);
-            cartItemEntity.setTotalPrice(productEntity.getPrice() * quantity);
-            productEntity.setQuantity(productEntity.getQuantity() - quantity);
-            productRepository.save(productEntity);
-            cartItemRepository.save(cartItemEntity);
-            wishListRepository.delete(wishListEntity);
-        }
+
         return "WishList added successfully";
     }
 
     /**
      * Logic for fetching particular product from cart
+     *
      * @param user      takes authentication of currently logged-in user
      * @param productId unique id of product
      * @return CartCost
@@ -305,6 +320,7 @@ public class CartService {
 
     /**
      * Logic for adding discount to cartItems in case of any disputes in previous orders
+     *
      * @param user     takes authentication of currently logged-in user
      * @param discount amount that needs to be decreased from total price
      * @return String

@@ -4,8 +4,10 @@ import java.util.List;
 
 public class CartCost {
     private List<CartItemRest> cartItem;
-    private double totalCost;
+    private double subTotal;
     private String discount;
+
+
 
     public String getDiscount() {
         return discount;
@@ -23,11 +25,11 @@ public class CartCost {
         this.cartItem = cartItem;
     }
 
-    public double getTotalCost() {
-        return totalCost;
+    public double getSubTotal() {
+        return subTotal;
     }
 
-    public void setTotalCost(double totalCost) {
-        this.totalCost = totalCost;
+    public void setSubTotal(double subTotal) {
+        this.subTotal = subTotal;
     }
 }

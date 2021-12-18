@@ -187,14 +187,14 @@ public class CartController {
                     paramType = "header")
     })
 
-    @PostMapping(path = "/addWishlist/{wishlistid}")
-    public String addWishlistToCart(@PathVariable(value = "wishlistid") long wishlistid,
+    @PostMapping(path = "/addWishlist/{productId}")
+    public String addWishlistToCart(@PathVariable(value = "productId") Long productId,
                                     @RequestParam(value = "quantity", defaultValue = "0") Integer quantity){
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
 
-        String wishListRest = cartService.addWishlistToCart(user, wishlistid, quantity);
+        String wishListRest = cartService.addWishlistToCart(user,quantity,productId);
         return wishListRest;
 
     }
