@@ -6,6 +6,7 @@ public class CartCost {
     private List<CartItemRest> cartItem;
     private double subTotal;
     private String discount;
+    private String deliveryCharge;
 
 
 
@@ -31,5 +32,13 @@ public class CartCost {
 
     public void setSubTotal(double subTotal) {
         this.subTotal = subTotal;
+    }
+
+    public String getDeliveryCharge() {
+        return deliveryCharge;
+    }
+
+    public void setDeliveryCharge(String deliveryCharge) {
+        this.deliveryCharge = deliveryCharge;
     }
 }

@@ -10,6 +10,7 @@ public class CartItemRest {
     private double totalPrice;
     private LocalDateTime createdDate;
 
+
     public Long getProductId() {
         return productId;
     }
@@ -49,4 +50,5 @@ public class CartItemRest {
     public void setTotalPrice(double totalPrice) {
         this.totalPrice = totalPrice;
     }
+
 }
