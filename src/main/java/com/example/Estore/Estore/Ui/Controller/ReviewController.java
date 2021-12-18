@@ -75,11 +75,13 @@ public class ReviewController {
     public ResponseEntity<ReviewRest> updateReview(@RequestBody ReviewRequestModel reviewRequestModel){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
-        if (reviewRepository.findById(reviewRequestModel.getProductId()).isEmpty())
+
+        if (reviewRepository.findByProductId(reviewRequestModel.getProductId()).isEmpty())
         {
-            throw new ClientSideException(Messages.PRODUCT_DOES_NOT_EXIST.getMessage());
+            throw new ClientSideException(Messages.NO_RECORD_FOUND.getMessage());
         }
         else
+
         return new ResponseEntity(reviewService.updateReview(reviewRequestModel,user),HttpStatus.OK);
 
 

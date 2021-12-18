@@ -47,7 +47,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductDto createProduct(ProductDto product) {
         ProductEntity productName = productRepository.findByProductName(product.getProductName());
         if (productName != null)
-            throw new ClientSideException(Messages.PRODUCT_ALREADY_EXISTS.getMessage());
+            throw new ClientSideException(Messages.PRODUCT_ALREADY_EXISTS_UPDATE.getMessage());
         ModelMapper modelMapper = new ModelMapper();
         ProductEntity productEntity = modelMapper.map(product, ProductEntity.class);
         CategoryEntity categoryEntity = categoryRepository.findByCategoryName(product.getCategoryName());

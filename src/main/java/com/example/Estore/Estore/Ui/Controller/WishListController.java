@@ -5,20 +5,17 @@ import com.example.Estore.Estore.Services.ServiceImpl.WishListService;
 import com.example.Estore.Estore.Services.UserService;
 import com.example.Estore.Estore.Shared.dto.User.UserDto;
 import com.example.Estore.Estore.Ui.Model.Response.Messages;
-import com.example.Estore.Estore.Ui.Model.Response.WishListRequest.WishListRest;
+import com.example.Estore.Estore.io.Entity.Product.ProductEntity;
 import com.example.Estore.Estore.io.Entity.WishList.WishListEntity;
-
 import com.example.Estore.Estore.io.Repositories.Product.ProductRepository;
-
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.util.List;
 
 @RestController
 @RequestMapping("/wishlist")
@@ -29,7 +26,6 @@ public class WishListController {
     WishListService wishListService;
     @Autowired
     ProductRepository productRepository;
-
 
     /**
      * Method is used to add product to wishlist
@@ -43,7 +39,7 @@ public class WishListController {
                     paramType = "header")
     })
     @PostMapping(path = "/add/{productId}")
-    public WishListRest addToWishlist(@PathVariable(value = "productId") Long productId) throws Exception {
+    public String addToWishlist(@PathVariable(value = "productId") Long productId) throws Exception {
         if (productId==null)
         {
             throw new Exception("product is null");
@@ -57,9 +53,8 @@ public class WishListController {
                 throw new ClientSideException(Messages.PRODUCT_DOES_NOT_EXIST.getMessage());
             }
             WishListEntity wishlistEntity = wishListService.addProductToWishList(user, productId);
-            return new ModelMapper().map(wishlistEntity, WishListRest.class);
+            return Messages.PRODUCT_ADDED_TO_WISHLIST.getMessage();
         }
-
     }
 
     /**
@@ -72,16 +67,12 @@ public class WishListController {
                     paramType = "header")
     })
     @GetMapping(path = "/get")
-    public Optional<WishListEntity> getWishlistItems()
+    public List<ProductEntity> getWishlistItems()
     {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
-
-
-        Optional<WishListEntity> wishListEntityList=wishListService.getWishListItem(user);
-
+        List<ProductEntity> wishListEntityList=wishListService.getWishListItem(user);
         return wishListEntityList;
-
     }
 
     /**
@@ -103,7 +94,7 @@ public class WishListController {
         else {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             UserDto user = userService.getUser(auth.getName());
-             wishListService.removeProductFromWishlist(user, ProductId);
+            wishListService.removeProductFromWishlist(user, ProductId);
             return Messages.DELETE_PRODUCT.getMessage();
 
 

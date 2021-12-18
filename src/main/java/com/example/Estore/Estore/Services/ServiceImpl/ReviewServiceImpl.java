@@ -50,7 +50,6 @@ public class ReviewServiceImpl {
             throw new ClientSideException(Messages.INVALID_INPUT.getMessage());
         }
         else if (optionalReviewEntity.isEmpty() ){
-
             reviewEntity.setProductEntity(reviewEntity.getProductEntity());
             reviewEntity.setUserEntity(reviewEntity.getUserEntity());
             reviewEntity.setRating(reviewEntity.getRating());
@@ -65,7 +64,7 @@ public class ReviewServiceImpl {
             return reviewRest;
         }
         else {
-            throw new ClientSideException(Messages.PRODUCT_ALREADY_EXISTS.getMessage());
+            throw new ClientSideException(Messages.REVIEW_ALREADY_EXISTS.getMessage());
         }
     }
 
@@ -109,7 +108,7 @@ public class ReviewServiceImpl {
         Optional<ReviewEntity> reviewEntity=reviewRepository.findAllByUserIdAndProductId(user.getId(),productId);
         if (reviewEntity.isEmpty())
         {
-            throw new ClientSideException(Messages.NO_RECORD_FOUND.getMessage());
+            throw new ClientSideException(Messages.REVIEW_NOT_FOUND.getMessage());
         }
         ReviewEntity reviewEntity1=reviewEntity.get();
 
