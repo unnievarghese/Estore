@@ -54,9 +54,13 @@ public enum Messages {
     REVIEW_NOT_FOUND("now review found for this productid"),
     OUT_OF_STOCK("required quantity not available,Please wait for the seller to add products"),
     CART_NOT_ACTIVE("Cart is not active,Please verify id again!"),
-    CART_IS_EMPTY("Your cart is empty, Please add products!");
-
-
+    CART_IS_EMPTY("Your cart is empty, Please add products!"),
+    DELETE_CATEGORY("category deleted successfully "),
+    CATEGORY_DOES_NOT_EXIST("Category with given id does not exist,Please verify the id again"),
+    PRODUCTNAME_DOES_NOT_EXIST("Product name does not exist,Please verify again"),
+    CATEGORY_ALREADY_EXIST("Category already exists"),
+    CATEGORY_IS_EMPTY("No products in category"),
+    PRODUCTS_IS_EMPTY("No products in list");
 
 
     private String Message;

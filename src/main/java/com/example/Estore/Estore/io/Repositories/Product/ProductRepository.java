@@ -19,17 +19,7 @@ import java.util.Optional;
 public interface ProductRepository extends PagingAndSortingRepository<ProductEntity,Long> {
 
 
-
-
-
-    
     ProductEntity findByProductId(Long productId);
-
-
-
-
-
-
     ProductEntity getById(Long productId);
     ProductEntity findByProductName(String productName);
 

@@ -22,19 +22,32 @@ public class ProductEntity implements Serializable {
     @Column(nullable = false)
     private Integer price;
     @Column(nullable = false)
+    @JsonIgnore
     private Integer quantity;
     @ManyToOne
     @JoinColumn(name = "categoryId")
     @JsonIgnore
     private CategoryEntity categoryDetails;
     @UpdateTimestamp
+    @JsonIgnore
     private LocalDateTime updatedTime;
     @CreationTimestamp
+    @JsonIgnore
     private LocalDateTime createTime;
-    public ProductEntity() {
+    @Column(nullable = false)
+    @JsonIgnore
+    private String sellerId;
+
+    public String getSellerId() {
+        return sellerId;
     }
 
+    public void setSellerId(String sellerId) {
+        this.sellerId = sellerId;
+    }
 
+    public ProductEntity() {
+    }
     public CategoryEntity getCategoryDetails() {
         return categoryDetails;
     }
@@ -54,9 +67,6 @@ public class ProductEntity implements Serializable {
     public void setProductId(Long productId) {
         this.productId = productId;
     }
-
-    //    @ManyToMany(mappedBy = "productEntityList", fetch = FetchType.LAZY)
-//    @JsonIgnore
 /*
     To get product name
      */

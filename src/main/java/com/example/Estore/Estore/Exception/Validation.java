@@ -25,7 +25,7 @@ public class Validation {
         return true;
     }
     /*
-    to be deleted
+    to check missing fields in product section
      */
     public Boolean checkFields(ProductRequestModel productDetails){
         if(productDetails.getProductName().isEmpty())return false;
