@@ -15,6 +15,9 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +41,6 @@ public class CartController {
      */
 
 //  http://localhost:8080/Estore/cart/addProduct/{productId}?quantity={?}
-
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authorization",
                     value = "${userController.authorizationHeader.description}",
@@ -63,11 +65,10 @@ public class CartController {
 
     /**
      * Method for fetching all the items in a cart of Login user
-     * @return CartCost All the items in cart along with total cost
+     * @return CartCost All the items in cart along with total cost and discount if any
      */
 
 //  http://localhost:8080/Estore/cart/fetch
-
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authorization",
                     value = "${userController.authorizationHeader.description}",
@@ -75,7 +76,7 @@ public class CartController {
     })
 
     @GetMapping(path = "/fetch")
-    public CartCost getCartByUserId() throws ClientSideException{
+    public CartCost getCartByUserId() throws ClientSideException {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
@@ -174,26 +175,26 @@ public class CartController {
     }
 
     /**
-     * Method for adding wishlist to cart
-     * @param wishlistid unique id of wishlist
+     * Method for adding wishlistItems to cart
+     * @param productId unique id of product
      * @param quantity   count of products that needs to be added to cart
      * @return String message whether wishlist is added to cart or not
      */
-//  http://localhost:8080/Estore/cart/addWishlist/{wishlistid}?quantity={count}
+//  http://localhost:8080/Estore/cart/addWishlist/{productId}?quantity={count}
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authorization",
                     value = "${userController.authorizationHeader.description}",
                     paramType = "header")
     })
 
-    @PostMapping(path = "/addWishlist/{wishlistid}")
-    public String addWishlistToCart(@PathVariable(value = "wishlistid") long wishlistid,
+    @PostMapping(path = "/addWishlist/{productId}")
+    public String addWishlistToCart(@PathVariable(value = "productId") Long productId,
                                     @RequestParam(value = "quantity", defaultValue = "0") Integer quantity) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
 
-        String wishListRest = cartService.addWishlistToCart(user, wishlistid, quantity);
+        String wishListRest = cartService.addWishlistToCart(user, quantity, productId);
         return wishListRest;
 
     }
@@ -212,13 +213,13 @@ public class CartController {
     })
 
     @GetMapping(path = "/fetch/{productId}")
-    public CartCost getCartByProductId(@PathVariable(value = "productId") Long productId) {
+    public CartItemRest getCartByProductId(@PathVariable(value = "productId") Long productId) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
 
-        CartCost cartCost = cartService.findByProductId(user, productId);
-        return cartCost;
+        CartItemRest cartItemRest = cartService.findByProductId(user, productId);
+        return cartItemRest;
     }
 
     /**
@@ -235,10 +236,28 @@ public class CartController {
     })
 
     @PostMapping(path = "/applyDiscount")
-    public String applyDiscount(@RequestParam(value = "discount",defaultValue = "0") int discount) throws ClientSideException{
+    public String applyDiscount(@RequestParam(value = "discount", defaultValue = "0") int discount) throws ClientSideException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserDto user = userService.getUser(auth.getName());
-        return cartService.applyPromoCode(user,discount);
+        return cartService.applyPromoCode(user, discount);
+    }
+
+    /**
+     * Method for sending a cart remainder by admin for proceeding it to check out when cart is abandoned
+     * @return String email sent successfully
+     */
+//  http://localhost:8080/Estore/cart/checkIdleCart
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authorization",
+                    value = "${userController.authorizationHeader.description}",
+                    paramType = "header")
+    })
+    @Secured("ROLE_ADMIN")
+    @PostMapping(path = "/checkIdleCart")
+    public ResponseEntity<String> sendCartRemainder() {
+        cartService.abandonedCartMail();
+        return new ResponseEntity<String>(Messages.EMAIL_SUCCESS.getMessage(), HttpStatus.OK);
+
     }
 
 }
